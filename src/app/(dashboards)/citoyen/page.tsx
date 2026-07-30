@@ -127,7 +127,7 @@ export default function CitizenDashboard() {
             <h1 className="text-3xl font-black tracking-tight">
               {user?.nom_complet.trim().split(" ")[0]}
             </h1>
-            <Link href="/citoyen/new">
+            <Link href="/citoyen/signalements/new">
               <Button className="gap-2 rounded-full h-11 px-6 shadow-lg shadow-primary/20">
                 <PlusCircle className="w-4 h-4" /> Nouveau signalement
               </Button>
