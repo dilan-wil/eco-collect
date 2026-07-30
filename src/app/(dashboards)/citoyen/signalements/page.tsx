@@ -91,53 +91,50 @@ export default function MesSignalements() {
         </div>
 
         {/* Tabs + search */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          {/* Tabs container - FIXED */}
-          <div className="relative flex-1 min-w-0 overflow-hidden">
-            <div className="overflow-x-auto overflow-y-hidden pb-2 -mb-2 scrollbar-hide">
-              <div className="flex gap-1.5 min-w-max">
-                {tabs.map((tab) => {
-                  const count = countFor(tab);
-                  const active = filter === tab;
-                  return (
-                    <button
-                      key={tab}
-                      onClick={() => setFilter(tab)}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border flex-shrink-0 ${
-                        active
-                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                          : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
-                      }`}
-                    >
-                      {tab}
-                      <span
-                        className={`text-[11px] px-1.5 py-0.5 rounded-full font-bold min-w-[20px] text-center ${
-                          active
-                            ? "bg-white/25 text-white"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            {/* Gradient fade on right - optional */}
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
-          </div>
-
-          <div className="relative shrink-0 sm:w-56 w-full">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Rechercher..."
-              className="pl-9 bg-card h-10 w-full"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
+        {/* Tabs + search */}
+<div className="flex flex-col sm:flex-row gap-3 mb-6">
+  {/* Tabs container - FIXED */}
+  <div className="w-full">
+  <div className="flex flex-wrap gap-1.5">
+    {tabs.map((tab) => {
+      const count = countFor(tab);
+      const active = filter === tab;
+      return (
+        <button
+          key={tab}
+          onClick={() => setFilter(tab)}
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+            active
+              ? "bg-primary text-primary-foreground border-primary shadow-sm"
+              : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+          }`}
+        >
+          {tab}
+          <span
+            className={`text-[11px] px-1.5 py-0.5 rounded-full font-bold min-w-[20px] text-center ${
+              active
+                ? "bg-white/25 text-white"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {count}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>
+  
+  <div className="relative shrink-0 sm:w-56 w-full">
+    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+    <Input
+      placeholder="Rechercher..."
+      className="pl-9 bg-card h-10 w-full"
+      value={search}
+      onChange={e => setSearch(e.target.value)}
+    />
+  </div>
+</div>
 
         {/* Cards grid */}
         <AnimatePresence mode="popLayout">
@@ -161,7 +158,102 @@ export default function MesSignalements() {
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              
+              {filteredReports.map((report, i) => {
+                const meta = wasteIcon[report.wasteType] ?? {
+                  bg: "bg-gray-100",
+                  text: "text-gray-700",
+                  label: "?",
+                };
+                const date = new Date(report.createdAt).toLocaleDateString(
+                  "fr-FR",
+                  { day: "numeric", month: "short", year: "numeric" },
+                );
+
+                return (
+                  <motion.div
+                    key={report.id}
+                    layout
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="h-full"
+                  >
+                    <Link
+                      href={`/citoyen/signalement/${report.id}`}
+                      className="block h-full"
+                    >
+                      <div className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg hover:border-primary/40 transition-all cursor-pointer h-full flex flex-col relative">
+                        {/* Top accent */}
+                        <div
+                          className={`h-1 w-full ${priorityDot[report.priority]} flex-shrink-0`}
+                        />
+
+                        <div className="p-4 flex flex-col flex-1 min-h-[180px]">
+                          {/* Icon + type + status */}
+                          <div className="flex items-start justify-between mb-3 gap-2">
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <div
+                                className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-sm ${meta.bg} ${meta.text} shrink-0`}
+                              >
+                                {meta.label}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-bold text-sm leading-tight truncate">
+                                  {report.wasteType}
+                                </p>
+                                <p className="text-[11px] text-muted-foreground font-medium">
+                                  {report.volume}
+                                </p>
+                              </div>
+                            </div>
+                            <StatusBadge
+                              status={report.status}
+                              className="flex-shrink-0"
+                            />
+                          </div>
+
+                          {/* Address */}
+                          <div className="flex items-start gap-1.5 mb-3 flex-1 min-h-0">
+                            <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                            <p className="text-xs text-muted-foreground line-clamp-2 break-words">
+                              {report.address}
+                            </p>
+                          </div>
+
+                          {/* Footer row */}
+                          <div className="flex items-center justify-between pt-3 border-t border-border/60 mt-auto gap-2">
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+                              <Calendar className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate">{date}</span>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              {report.aiConfidence > 0 && (
+                                <span className="flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                  <BrainCircuit className="w-3 h-3 shrink-0" />
+                                  {report.aiConfidence}%
+                                </span>
+                              )}
+                              <span className="flex items-center gap-1 text-[11px] text-muted-foreground whitespace-nowrap">
+                                <Package className="w-3 h-3 shrink-0" />
+                                {report.accumulationLevel}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-card/95 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl">
+                          <div className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg">
+                            <Eye className="w-4 h-4 shrink-0" /> Voir les
+                            détails
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </AnimatePresence>
