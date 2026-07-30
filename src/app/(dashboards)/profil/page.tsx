@@ -10,6 +10,7 @@ import {
   Camera, CheckCircle2, MapPin, Phone, Mail, Lock,
   TrendingUp, Users, BarChart3, Edit3, Save
 } from "lucide-react"
+import { getInitials } from "@/lib/get-initials"
 
 /* ─── shared sub-components ─────────────────────────────── */
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
@@ -56,6 +57,7 @@ function NotifRow({ label, desc }: { label: string; desc: string }) {
 
 /* ─── role-specific panels ───────────────────────────────── */
 function CitoyenProfile({ darkMode, setDarkMode }: any) {
+  const { user } = useAppStore()
   const stats = [
     { value: '12', label: 'Signalements', icon: Camera, color: 'bg-primary/10 text-primary' },
     { value: '9',  label: 'Collectés',    icon: CheckCircle2, color: 'bg-green-100 text-green-700' },
@@ -239,6 +241,7 @@ const PROFILES = {
 export default function Profil() {
   const { role, darkMode, setDarkMode } = useAppStore()
   const p = PROFILES[role]
+  const { user } = useAppStore()
 
   return (
       <div className="max-w-2xl mx-auto space-y-6">
@@ -251,11 +254,11 @@ export default function Profil() {
             <CardContent className="px-6 pb-6 pt-0">
               <div className="flex items-end gap-4 -mt-10 mb-4">
                 <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${p.gradient} flex items-center justify-center text-white font-black text-2xl ring-4 ring-background shadow-lg shrink-0`}>
-                  {p.initials}
+                  {getInitials(user?.nom_complet)}
                 </div>
                 <div className="pb-1">
-                  <h2 className="text-xl font-bold">{p.name}</h2>
-                  <p className="text-sm text-muted-foreground">{p.title}</p>
+                  <h2 className="text-xl font-bold">{user?.nom_complet}</h2>
+                  <p className="text-sm text-muted-foreground">{user?.role}</p>
                   <p className="text-sm font-medium text-primary">{p.subtitle}</p>
                 </div>
               </div>

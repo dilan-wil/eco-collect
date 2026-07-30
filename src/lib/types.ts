@@ -1,16 +1,11 @@
 // types/signalements.ts
 
 export type Categorie = 
-  | 'incident'
-  | 'bug'
-  | 'demande'
-  | 'plainte'
-  | 'propreté'
-  | 'voirie'
-  | 'éclairage'
-  | 'espaces_verts'
-  | 'bruit'
-  | 'autre';
+  | 'Plastique'
+  | 'Organique'
+  | 'Construction'
+  | 'Électronique'
+  | 'Dangereux'
 
 export type NiveauAccumulation = 
   | 'faible'
@@ -79,6 +74,7 @@ export interface Signalement {
   adresse: string | null;
   ville: string | null;
   code_postal: string | null;
+  confiance_ia: number;
   pays: string;
   latitude: number | null;
   longitude: number | null;

@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { Signalement } from "@/lib/types";
+import { useAppStore } from "@/lib/store";
+import { signalementsApi } from "@/lib/api";
 
 const wasteIcon: Record<string, { bg: string; text: string; label: string }> = {
   Plastique: { bg: "bg-blue-100", text: "text-blue-700", label: "PLA" },
@@ -43,18 +46,27 @@ const tabStatusMap: Record<string, string | null> = {
 const tabs = Object.keys(tabStatusMap);
 
 export default function MesSignalements() {
-  const myReports = mockReports.filter((r) => r.citizenId === "CIT-001");
+  const { user } = useAppStore();
+  const [signalements, setSignalements] = React.useState<Signalement[]>([]);
   const [filter, setFilter] = React.useState("Tous");
   const [search, setSearch] = React.useState("");
 
-  const filteredReports = myReports.filter((r) => {
+  React.useEffect(() => {
+    async function getMySignalement() {
+      const { data, error } = await signalementsApi.getMine();
+      setSignalements(data ?? []);
+    }
+    getMySignalement();
+  }, [user]);
+
+  const filteredReports = signalements.filter((r) => {
     const mapped = tabStatusMap[filter];
-    if (mapped && r.status !== mapped) return false;
+    if (mapped && r.statut !== mapped) return false;
     const q = search.toLowerCase();
     if (
       q &&
-      !r.address.toLowerCase().includes(q) &&
-      !r.wasteType.toLowerCase().includes(q)
+      !r.adresse?.toLowerCase().includes(q) &&
+      !r.categorie.toLowerCase().includes(q)
     )
       return false;
     return true;
@@ -62,8 +74,8 @@ export default function MesSignalements() {
 
   const countFor = (tab: string) => {
     const mapped = tabStatusMap[tab];
-    if (!mapped) return myReports.length;
-    return myReports.filter((r) => r.status === mapped).length;
+    if (!mapped) return signalements.length;
+    return signalements.filter((r) => r.statut === mapped).length;
   };
 
   return (
@@ -76,13 +88,13 @@ export default function MesSignalements() {
               Mes Signalements
             </h1>
             <p className="text-muted-foreground text-sm mt-1 truncate">
-              {myReports.length} contributions · suivez l'avancement en temps
+              {signalements.length} contributions · suivez l'avancement en temps
               réel
             </p>
           </div>
           <Button className="shrink-0 w-full sm:w-auto">
             <Link
-              href="/citoyen/nouveau-signalement"
+              href="/citoyen/signalements/new"
               className="flex items-center justify-center w-full"
             >
               <Plus className="w-4 h-4 mr-2 shrink-0" /> Nouveau
@@ -92,49 +104,49 @@ export default function MesSignalements() {
 
         {/* Tabs + search */}
         {/* Tabs + search */}
-<div className="flex flex-col sm:flex-row gap-3 mb-6">
-  {/* Tabs container - FIXED */}
-  <div className="w-full">
-  <div className="flex flex-wrap gap-1.5">
-    {tabs.map((tab) => {
-      const count = countFor(tab);
-      const active = filter === tab;
-      return (
-        <button
-          key={tab}
-          onClick={() => setFilter(tab)}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-            active
-              ? "bg-primary text-primary-foreground border-primary shadow-sm"
-              : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
-          }`}
-        >
-          {tab}
-          <span
-            className={`text-[11px] px-1.5 py-0.5 rounded-full font-bold min-w-[20px] text-center ${
-              active
-                ? "bg-white/25 text-white"
-                : "bg-muted text-muted-foreground"
-            }`}
-          >
-            {count}
-          </span>
-        </button>
-      );
-    })}
-  </div>
-</div>
-  
-  <div className="relative shrink-0 sm:w-56 w-full">
-    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-    <Input
-      placeholder="Rechercher..."
-      className="pl-9 bg-card h-10 w-full"
-      value={search}
-      onChange={e => setSearch(e.target.value)}
-    />
-  </div>
-</div>
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          {/* Tabs container - FIXED */}
+          <div className="w-full">
+            <div className="flex flex-wrap gap-1.5">
+              {tabs.map((tab) => {
+                const count = countFor(tab);
+                const active = filter === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setFilter(tab)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+                      active
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    {tab}
+                    <span
+                      className={`text-[11px] px-1.5 py-0.5 rounded-full font-bold min-w-[20px] text-center ${
+                        active
+                          ? "bg-white/25 text-white"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="relative shrink-0 sm:w-56 w-full">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Rechercher..."
+              className="pl-9 bg-card h-10 w-full"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
 
         {/* Cards grid */}
         <AnimatePresence mode="popLayout">
@@ -159,12 +171,12 @@ export default function MesSignalements() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredReports.map((report, i) => {
-                const meta = wasteIcon[report.wasteType] ?? {
+                const meta = wasteIcon[report.categorie] ?? {
                   bg: "bg-gray-100",
                   text: "text-gray-700",
                   label: "?",
                 };
-                const date = new Date(report.createdAt).toLocaleDateString(
+                const date = new Date(report.date_creation).toLocaleDateString(
                   "fr-FR",
                   { day: "numeric", month: "short", year: "numeric" },
                 );
@@ -180,13 +192,13 @@ export default function MesSignalements() {
                     className="h-full"
                   >
                     <Link
-                      href={`/citoyen/signalement/${report.id}`}
+                      href={`/citoyen/signalements/${report.id}`}
                       className="block h-full"
                     >
                       <div className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg hover:border-primary/40 transition-all cursor-pointer h-full flex flex-col relative">
                         {/* Top accent */}
                         <div
-                          className={`h-1 w-full ${priorityDot[report.priority]} flex-shrink-0`}
+                          className={`h-1 w-full ${priorityDot[report.priorite]} flex-shrink-0`}
                         />
 
                         <div className="p-4 flex flex-col flex-1 min-h-[180px]">
@@ -200,24 +212,21 @@ export default function MesSignalements() {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="font-bold text-sm leading-tight truncate">
-                                  {report.wasteType}
+                                  {report.categorie}
                                 </p>
                                 <p className="text-[11px] text-muted-foreground font-medium">
-                                  {report.volume}
+                                  {report.niveau_accumulation}
                                 </p>
                               </div>
                             </div>
-                            <StatusBadge
-                              status={report.status}
-                              className="flex-shrink-0"
-                            />
+                            <StatusBadge status={report.statut} />
                           </div>
 
                           {/* Address */}
                           <div className="flex items-start gap-1.5 mb-3 flex-1 min-h-0">
                             <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
                             <p className="text-xs text-muted-foreground line-clamp-2 break-words">
-                              {report.address}
+                              {report.adresse}
                             </p>
                           </div>
 
@@ -228,15 +237,15 @@ export default function MesSignalements() {
                               <span className="truncate">{date}</span>
                             </div>
                             <div className="flex items-center gap-2 flex-shrink-0">
-                              {report.aiConfidence > 0 && (
+                              {report.confiance_ia > 0 && (
                                 <span className="flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                                   <BrainCircuit className="w-3 h-3 shrink-0" />
-                                  {report.aiConfidence}%
+                                  {report.confiance_ia}%
                                 </span>
                               )}
                               <span className="flex items-center gap-1 text-[11px] text-muted-foreground whitespace-nowrap">
                                 <Package className="w-3 h-3 shrink-0" />
-                                {report.accumulationLevel}
+                                {report.niveau_accumulation}
                               </span>
                             </div>
                           </div>
