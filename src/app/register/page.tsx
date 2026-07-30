@@ -70,7 +70,7 @@ export default function Register() {
       });
       await userApi.create({
         email: form.email,
-        full_name: `${form.firstName} ${form.lastName}`,
+        nom_complet: `${form.firstName} ${form.lastName}`,
         phone: form.phone,
         role: 'CITOYEN',
       });

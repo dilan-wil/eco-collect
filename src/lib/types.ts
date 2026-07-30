@@ -1,3 +1,62 @@
+// types/signalements.ts
+
+export type Categorie = 
+  | 'incident'
+  | 'bug'
+  | 'demande'
+  | 'plainte'
+  | 'propreté'
+  | 'voirie'
+  | 'éclairage'
+  | 'espaces_verts'
+  | 'bruit'
+  | 'autre';
+
+export type NiveauAccumulation = 
+  | 'faible'
+  | 'moyen'
+  | 'élevé'
+  | 'critique';
+
+export type Priorite = 
+  | 'basse'
+  | 'moyenne'
+  | 'haute'
+  | 'critique';
+
+export type Statut = 
+  | 'nouveau'
+  | 'en_cours'
+  | 'resolu'
+  | 'ferme'
+  | 'rejete';
+
+
+// Pour la création (sans les champs auto-générés)
+export type CreateSignalement = Omit<
+  Signalement,
+  'id' | 'date_creation' | 'date_modification' | 'statut'
+> & {
+  statut?: Statut;
+};
+
+// Pour la mise à jour (tous les champs optionnels)
+export type UpdateSignalement = Partial<Omit<Signalement, 'id' | 'id_utilisateur' | 'date_creation'>>;
+
+// Pour les filtres de recherche
+export interface SignalementFilters {
+  categorie?: Categorie;
+  statut?: Statut;
+  priorite?: Priorite;
+  niveau_accumulation?: NiveauAccumulation;
+  id_utilisateur?: string;
+  assigne_a?: string;
+  date_debut?: Date;
+  date_fin?: Date;
+  ville?: string;
+  code_postal?: string;
+  recherche?: string; // Recherche dans description
+}
 export interface User {
   id: string;
   email: string;
@@ -9,3 +68,26 @@ export interface User {
   created_at: string;
   updated_at: string;
 };
+
+export interface Signalement {
+  id: string;
+  description: string;
+  categorie: Categorie;
+  niveau_accumulation: NiveauAccumulation;
+  priorite: Priorite;
+  statut: Statut;
+  adresse: string | null;
+  ville: string | null;
+  code_postal: string | null;
+  pays: string;
+  latitude: number | null;
+  longitude: number | null;
+  fichier_url: string | null;
+  id_utilisateur: string;
+  assigne_a: string | null;
+  categorie_id: string | null;
+  date_creation: Date;
+  date_modification: Date;
+  commentaire_interne: string | null;
+  commentaire_public: string | null;
+}
