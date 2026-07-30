@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
 import { userApi } from "@/lib/api"
+import Image from "next/image"
 
 interface FormData {
   firstName: string
@@ -93,10 +94,12 @@ export default function Register() {
       <div className="min-h-screen bg-background flex flex-col">
         <header className="h-16 flex items-center px-6 border-b border-border/40">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center">
-              <Leaf className="w-5 h-5" />
-            </div>
-            <span className="font-bold text-lg tracking-tight">EcoKamer<span className="text-primary">.ai</span></span>
+            <Image
+              src="/ecoLogo.png"
+              width={150}
+              height={100}
+              alt="EcoKamer Logo"
+            />
           </Link>
         </header>
         <div className="flex-1 flex items-center justify-center p-4">
