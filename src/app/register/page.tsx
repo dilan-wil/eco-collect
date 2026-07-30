@@ -96,7 +96,7 @@ export default function Register() {
             <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center">
               <Leaf className="w-5 h-5" />
             </div>
-            <span className="font-bold text-lg tracking-tight">EcoCollect<span className="text-primary">.ai</span></span>
+            <span className="font-bold text-lg tracking-tight">EcoKamer<span className="text-primary">.ai</span></span>
           </Link>
         </header>
         <div className="flex-1 flex items-center justify-center p-4">
@@ -110,7 +110,7 @@ export default function Register() {
             </div>
             <h2 className="text-2xl font-bold mb-2">Compte créé !</h2>
             <p className="text-muted-foreground mb-8">
-              Bienvenue, <strong>{form.firstName}</strong> ! Votre compte citoyen EcoCollect AI est prêt.
+              Bienvenue, <strong>{form.firstName}</strong> ! Votre compte citoyen EcoKamer AI est prêt.
             </p>
             <Button onClick={goToDashboard} className="rounded-full px-8 h-11">
               Accéder à mon espace <ArrowRight className="w-4 h-4 ml-2" />
@@ -128,7 +128,7 @@ export default function Register() {
           <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center shadow-md shadow-primary/20">
             <Leaf className="w-5 h-5" />
           </div>
-          <span className="font-bold text-lg tracking-tight">EcoCollect<span className="text-primary">.ai</span></span>
+          <span className="font-bold text-lg tracking-tight">EcoKamer<span className="text-primary">.ai</span></span>
         </Link>
       </header>
 
@@ -141,7 +141,7 @@ export default function Register() {
           >
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold tracking-tight mb-2">Créer un compte</h1>
-              <p className="text-muted-foreground">Rejoignez la communauté EcoCollect AI et aidez à garder Lyon propre</p>
+              <p className="text-muted-foreground">Rejoignez la communauté EcoKamer AI et aidez à garder Lyon propre</p>
             </div>
 
             <div className="bg-card border rounded-2xl shadow-lg p-8">

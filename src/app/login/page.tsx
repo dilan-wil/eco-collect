@@ -82,7 +82,7 @@ export default function Login() {
                 Bon retour !
               </h1>
               <p className="text-muted-foreground">
-                Connectez-vous à votre espace EcoCollect AI
+                Connectez-vous à votre espace EcoKamer AI
               </p>
             </div>
 

@@ -59,7 +59,7 @@ export function Sidebar() {
           <div className="w-8 h-8 bg-sidebar-primary text-primary-foreground rounded flex items-center justify-center shrink-0">
             <Map className="w-5 h-5" />
           </div>
-          EcoCollect AI
+          EcoKamer AI
         </Link>
       </div>
 

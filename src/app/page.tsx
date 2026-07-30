@@ -276,7 +276,7 @@ export default function LandingPage() {
               <Leaf className="w-5 h-5 text-white" />
             </div>
             <span className="font-black text-xl tracking-tight">
-              EcoCollect<span className="text-primary">.ai</span>
+              EcoKamer<span className="text-primary">.ai</span>
             </span>
           </div>
 
@@ -394,7 +394,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.25 }}
               className="text-lg md:text-xl text-white/55 max-w-2xl leading-relaxed mb-10"
             >
-              EcoCollect AI connecte les citoyens, les agents de collecte et les
+              EcoKamer AI connecte les citoyens, les agents de collecte et les
               administrateurs dans une plateforme unifiée, propulsée par
               l'intelligence artificielle.
             </motion.p>
@@ -944,7 +944,7 @@ export default function LandingPage() {
                   <Leaf className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-black text-xl">
-                  EcoCollect<span className="text-primary">.ai</span>
+                  EcoKamer<span className="text-primary">.ai</span>
                 </span>
               </div>
               <p className="text-white/40 text-sm max-w-xs leading-relaxed">

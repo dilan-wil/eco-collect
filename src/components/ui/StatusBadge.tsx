@@ -3,7 +3,7 @@ import { Badge } from "./badge"
 
 export function StatusBadge({ status }: { status: string }) {
   let variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info" = "default"
-  
+
   switch (status.toLowerCase()) {
     case 'complété':
     case 'validé':
