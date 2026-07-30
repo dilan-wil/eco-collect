@@ -20,7 +20,7 @@ import {
   Star,
   Clock,
 } from "lucide-react";
-
+import Image from "next/image";
 // ─── Animated counter ────────────────────────────────────────────────────────
 function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const ref = React.useRef(null);
@@ -272,12 +272,12 @@ export default function LandingPage() {
       <header className="fixed top-0 w-full z-50 border-b border-white/8 backdrop-blur-xl bg-[#080F0A]/80">
         <div className="max-w-7xl mx-auto px-6 md:px-10 h-18 flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-black text-xl tracking-tight">
-              EcoKamer<span className="text-primary">.ai</span>
-            </span>
+            <Image
+              src="/ecoLogo.png"
+              width={150}
+              height={100}
+              alt="EcoKamer Logo"
+            />
           </div>
 
           {/* Desktop nav */}
