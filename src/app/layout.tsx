@@ -16,8 +16,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "EcoKamer - Gestion intelligente des déchets au Cameroun",
-  description: "Application de collecte de déchets intelligente et écologique pour un Cameroun plus propre.",
-  keywords: "collecte déchets, Cameroun, écologie, recyclage, environnement, EcoKamer",
+  description:
+    "Application de collecte de déchets intelligente et écologique pour un Cameroun plus propre.",
+  keywords:
+    "collecte déchets, Cameroun, écologie, recyclage, environnement, EcoKamer",
   authors: [{ name: "EcoKamer Team" }],
   creator: "EcoKamer",
   publisher: "EcoKamer",
@@ -27,6 +29,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "EcoKamer",
+    images: [
+      {
+        url: "/ecoIcon.png",
+        width: 1200,
+        height: 630,
+        alt: "EcoKamer - Application de collecte de déchets",
+      },
+    ],
   },
   icons: {
     icon: "/ecoIcon.png",
@@ -44,7 +54,7 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
-}
+};
 
 export default function RootLayout({
   children,
