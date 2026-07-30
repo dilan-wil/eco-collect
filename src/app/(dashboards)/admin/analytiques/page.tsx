@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react"
 import { chartData } from "@/lib/mockData"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react"
 import { mockReports } from "@/lib/mockData"
 import { MapComponent } from "@/components/ui/MapComponent"

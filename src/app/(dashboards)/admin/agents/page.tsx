@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react"
 import { mockAgents } from "@/lib/mockData"
 import { AgentCard } from "@/components/ui/AgentCard"
