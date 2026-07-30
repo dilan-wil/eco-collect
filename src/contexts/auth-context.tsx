@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
     if (error) throw error;
     setUser(data.user);
+    router.push(`/${(user?.user_metadata?.role).toLowerCase()}`)
   };
 
   // --- OTP methods ---

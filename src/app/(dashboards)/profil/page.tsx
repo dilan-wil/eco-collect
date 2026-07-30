@@ -231,9 +231,9 @@ function DarkModeCard({ darkMode, setDarkMode }: any) {
 
 /* ─── avatars per role ───────────────────────────────────── */
 const PROFILES = {
-  citoyen: { name: 'Jean Dupont',       initials: 'JD', title: 'Citoyen Actif',         subtitle: 'Gardien Vert 🌿',  gradient: 'from-primary to-secondary' },
-  admin:   { name: 'Admin Lyon Métr.',  initials: 'AD', title: 'Administrateur',         subtitle: 'Accès complet 🔐', gradient: 'from-blue-500 to-violet-600' },
-  agent:   { name: 'Jean Dupont',       initials: 'JD', title: 'Agent de Collecte',      subtitle: 'Note: ⭐ 4.8/5',   gradient: 'from-emerald-500 to-teal-600' },
+  CITOYEN: { name: 'Jean Dupont',       initials: 'JD', title: 'Citoyen Actif',         subtitle: 'Gardien Vert 🌿',  gradient: 'from-primary to-secondary' },
+  ADMIN:   { name: 'Admin Lyon Métr.',  initials: 'AD', title: 'Administrateur',         subtitle: 'Accès complet 🔐', gradient: 'from-blue-500 to-violet-600' },
+  AGENT:   { name: 'Jean Dupont',       initials: 'JD', title: 'Agent de Collecte',      subtitle: 'Note: ⭐ 4.8/5',   gradient: 'from-emerald-500 to-teal-600' },
 }
 
 export default function Profil() {
@@ -265,9 +265,9 @@ export default function Profil() {
 
         {/* Role-specific content */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          {role === 'citoyen' && <CitoyenProfile darkMode={darkMode} setDarkMode={setDarkMode} />}
-          {role === 'admin'   && <AdminProfile   darkMode={darkMode} setDarkMode={setDarkMode} />}
-          {role === 'agent'   && <AgentProfile   darkMode={darkMode} setDarkMode={setDarkMode} />}
+          {role === 'CITOYEN' && <CitoyenProfile darkMode={darkMode} setDarkMode={setDarkMode} />}
+          {role === 'ADMIN'   && <AdminProfile   darkMode={darkMode} setDarkMode={setDarkMode} />}
+          {role === 'AGENT'   && <AgentProfile   darkMode={darkMode} setDarkMode={setDarkMode} />}
         </motion.div>
       </div>
   )

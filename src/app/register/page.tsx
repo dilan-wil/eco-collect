@@ -2,11 +2,13 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useAppStore } from "@/lib/store"
+import { Role, useAppStore } from "@/lib/store"
 import { motion } from "framer-motion"
 import { Leaf, Mail, Lock, Eye, EyeOff, User, Phone, ArrowRight, Loader2, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { useAuth } from "@/contexts/auth-context"
+import { userApi } from "@/lib/api"
 
 interface FormData {
   firstName: string
@@ -23,6 +25,7 @@ type Errors = Partial<Record<keyof FormData, string>>
 export default function Register() {
   const navigate = useRouter()
   const { setRole } = useAppStore()
+  const { signUp, user } = useAuth()
   const [showPassword, setShowPassword] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const [done, setDone] = React.useState(false)
@@ -58,15 +61,31 @@ export default function Register() {
     e.preventDefault()
     if (!validate()) return
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1500))
-    setLoading(false)
+    try {
+      await signUp(form.email, form.password, {
+        fullName: `${form.firstName} ${form.lastName}`,
+        role: 'CITOYEN',
+        phone: form.phone,
+      });
+      await userApi.create({
+        email: form.email,
+        full_name: `${form.firstName} ${form.lastName}`,
+        phone: form.phone,
+        role: 'CITOYEN',
+      });
+      toast.success("Account created successfully!");
     setDone(true)
+    } catch (error: any) {
+      toast.error(error.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const goToDashboard = () => {
-    setRole('citoyen')
+    setRole(`${(user?.user_metadata?.role) as Role}`)
     toast.success(`Bienvenue, ${form.firstName} ! Votre compte citoyen est prêt.`)
-    navigate.push('/citoyen/')
+    navigate.push(`/${(user?.user_metadata?.role).toLowerCase()}/`)
   }
 
   if (done) {
@@ -137,7 +156,7 @@ export default function Register() {
                         type="text"
                         value={form.firstName}
                         onChange={set('firstName')}
-                        placeholder="Jean"
+                        placeholder="Christian"
                         className={`w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 ${errors.firstName ? 'border-destructive' : 'border-input'}`}
                       />
                     </div>
@@ -149,7 +168,7 @@ export default function Register() {
                       type="text"
                       value={form.lastName}
                       onChange={set('lastName')}
-                      placeholder="Dupont"
+                      placeholder="Talla"
                       className={`w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 ${errors.lastName ? 'border-destructive' : 'border-input'}`}
                     />
                     {errors.lastName && <p className="text-xs text-destructive">{errors.lastName}</p>}
@@ -165,7 +184,7 @@ export default function Register() {
                       type="email"
                       value={form.email}
                       onChange={set('email')}
-                      placeholder="jean.dupont@exemple.fr"
+                      placeholder="christian.talla@exemple.com"
                       className={`w-full pl-10 pr-4 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 ${errors.email ? 'border-destructive' : 'border-input'}`}
                     />
                   </div>
@@ -181,7 +200,7 @@ export default function Register() {
                       type="tel"
                       value={form.phone}
                       onChange={set('phone')}
-                      placeholder="06 12 34 56 78"
+                      placeholder="699999999"
                       className={`w-full pl-10 pr-4 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 ${errors.phone ? 'border-destructive' : 'border-input'}`}
                     />
                   </div>

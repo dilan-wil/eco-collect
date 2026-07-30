@@ -29,6 +29,9 @@ export default function ProtectedRoute({
     }
 
     if (allowedRoles?.length) {
+      console.log(allowedRoles)
+      console.log(user.user_metadata?.role)
+      console.log("Because of role")
       const role = user.user_metadata?.role;
       if (!allowedRoles.includes(role)) {
         router.replace(redirectTo);

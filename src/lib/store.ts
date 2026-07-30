@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Role = 'citoyen' | 'admin' | 'agent';
+export type Role = 'CITOYEN' | 'ADMIN' | 'AGENT';
 
 interface AppState {
   role: Role;
@@ -14,7 +14,7 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  role: 'citoyen',
+  role: 'CITOYEN',
   setRole: (role) => set({ role }),
   darkMode: false,
   setDarkMode: (dark) => {

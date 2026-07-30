@@ -1,0 +1,63 @@
+-- Enable RLS (safe to run repeatedly)
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+-- Optional but recommended: force policies to be ANDed for a table
+-- (leave default as-is if you already use permissive policies)
+
+-- 1) CITOYEN can INSERT any user row ("add")
+CREATE POLICY "users_insert_citoyen"
+ON public.users
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM public.users cu
+    WHERE cu.id = auth.uid()
+      AND cu.role = 'CITOYEN'
+  )
+);
+
+-- 2) ADMIN can INSERT users with role AGENT or ADMIN
+CREATE POLICY "users_insert_admin_agent_admin"
+ON public.users
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM public.users au
+    WHERE au.id = auth.uid()
+      AND au.role = 'ADMIN'
+  )
+  AND (role IN ('AGENT','ADMIN'))
+);
+
+-- 3) ADMIN can DELETE any user
+CREATE POLICY "users_delete_admin_any"
+ON public.users
+FOR DELETE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1
+    FROM public.users au
+    WHERE au.id = auth.uid()
+      AND au.role = 'ADMIN'
+  )
+);
+
+-- 4) Non-ADMIN can DELETE only their own row
+CREATE POLICY "users_delete_non_admin_own"
+ON public.users
+FOR DELETE
+TO authenticated
+USING (
+  id = auth.uid()
+  AND NOT EXISTS (
+    SELECT 1
+    FROM public.users au
+    WHERE au.id = auth.uid()
+      AND au.role = 'ADMIN'
+  )
+);
