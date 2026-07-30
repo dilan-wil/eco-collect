@@ -15,20 +15,20 @@ import {
 } from "lucide-react"
 
 const navByRole = {
-  citoyen: [
+  CITOYEN: [
     { href: "/citoyen/dashboard",          label: "Accueil",   icon: LayoutDashboard },
     { href: "/citoyen/nouveau-signalement", label: "Signaler",  icon: PlusCircle },
     { href: "/citoyen/mes-signalements",    label: "Dépôts",    icon: FileText },
     { href: "/citoyen/points",              label: "Points",    icon: Star },
   ],
-  admin: [
+  ADMIN: [
     { href: "/admin/dashboard",    label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/signalements", label: "Rapports",  icon: FileText },
     { href: "/admin/carte",        label: "Carte",     icon: Map },
     { href: "/admin/agents",       label: "Agents",    icon: Users },
     { href: "/admin/vehicules",    label: "Flotte",    icon: Truck },
   ],
-  agent: [
+  AGENT: [
     { href: "/agent/dashboard",  label: "Tournée",   icon: LayoutDashboard },
     { href: "/agent/missions",   label: "Missions",  icon: FileText },
     { href: "/admin/carte",      label: "Carte",     icon: Map },

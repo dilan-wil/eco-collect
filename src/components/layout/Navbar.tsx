@@ -3,6 +3,7 @@ import Link from "next/link"
 import { useAppStore } from "@/lib/store"
 import { Bell, Search, Menu, ChevronDown, X } from "lucide-react"
 import { Button } from "../ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 export function Navbar() {
   const { role, setRole, setSidebarOpen, sidebarOpen } = useAppStore()
@@ -20,8 +21,8 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const roleLabel = role === 'citoyen' ? 'Citoyen' : role === 'admin' ? 'Administrateur' : 'Agent'
-  const initials = role === 'citoyen' ? 'JD' : role === 'admin' ? 'AD' : 'AG'
+  const roleLabel = role === 'CITOYEN' ? 'CITOYEN' : role === 'ADMIN' ? 'Administrateur' : 'Agent'
+  const initials = role === 'CITOYEN' ? 'JD' : role === 'ADMIN' ? 'AD' : 'AG'
 
   return (
     <header className="h-16 glass sticky top-0 z-30 flex items-center justify-between px-4 md:px-8 w-full transition-all border-b border-border/40">
@@ -57,9 +58,10 @@ export function Navbar() {
         </Link>
 
         <Link href="/profil">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-semibold text-sm cursor-pointer ring-2 ring-background shadow-sm hover:opacity-90 transition-opacity">
-            {initials}
-          </div>
+          <Avatar>
+            <AvatarImage src={""} />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
         </Link>
       </div>
     </header>

@@ -25,13 +25,13 @@ export function Sidebar() {
   const { role, sidebarOpen, setSidebarOpen } = useAppStore()
 
   const navItems = {
-    citoyen: [
+    CITOYEN: [
       { href: "/citoyen/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
       { href: "/citoyen/nouveau-signalement", label: "Nouveau signalement", icon: PlusCircle },
       { href: "/citoyen/mes-signalements", label: "Mes signalements", icon: FileText },
       { href: "/citoyen/points", label: "Mes Points", icon: Star },
     ],
-    admin: [
+    ADMIN: [
       { href: "/admin/dashboard", label: "Mission Control", icon: LayoutDashboard },
       { href: "/admin/signalements", label: "Signalements", icon: FileText },
       { href: "/admin/missions", label: "Missions", icon: Activity },
@@ -41,7 +41,7 @@ export function Sidebar() {
       { href: "/admin/validation-ia", label: "Validation IA", icon: BrainCircuit },
       { href: "/admin/analytiques", label: "Analytiques", icon: PieChart },
     ],
-    agent: [
+    AGENT: [
       { href: "/agent/dashboard", label: "Ma Tournée", icon: LayoutDashboard },
       { href: "/agent/missions",  label: "Mes Missions", icon: Activity },
     ],
