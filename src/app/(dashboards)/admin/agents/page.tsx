@@ -2,7 +2,7 @@
 import * as React from "react"
 import { mockAgents } from "@/lib/mockData"
 import { AgentCard } from "@/components/ui/AgentCard"
-import { Input } from "@/components/ui/form-elements"
+import { Input } from "@/components/ui/input"
 import { Search, Filter, Users, Plus, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"

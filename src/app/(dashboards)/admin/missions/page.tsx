@@ -4,7 +4,7 @@ import { mockReports, mockAgents } from "@/lib/mockData"
 import { StatusBadge } from "@/components/ui/StatusBadge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/form-elements"
+import { Input } from "@/components/ui/input"
 import { Search, MapPin, Clock, Truck, MoreHorizontal } from "lucide-react"
 
 export default function Missions() {
