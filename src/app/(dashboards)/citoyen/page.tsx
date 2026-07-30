@@ -21,14 +21,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { Signalement } from "@/lib/types";
+import { signalementsApi } from "@/lib/api";
 
-const myReports = mockReports.filter((r) => r.citizenId === "CIT-001");
-const pending = myReports.filter((r) => r.status === "En attente").length;
-const active = myReports.filter((r) =>
-  ["Validé", "Assigné", "En cours"].includes(r.status),
-).length;
-const completed = myReports.filter((r) => r.status === "Complété").length;
-const USER_POINTS = 420;
 const USER_LEVEL = "Gardien Vert";
 
 const wasteIcon: Record<string, string> = {
@@ -61,7 +56,7 @@ function StatCard({ value, label, icon: Icon, color, delay }: any) {
   );
 }
 
-function ReportRow({ r, i }: { r: (typeof myReports)[0]; i: number }) {
+function ReportRow({ r, i }: { r: Signalement; i: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -12 }}
@@ -71,19 +66,19 @@ function ReportRow({ r, i }: { r: (typeof myReports)[0]; i: number }) {
       <Link href={`/citoyen/signalements/${r.id}`}>
         <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/60 transition-colors cursor-pointer group">
           <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-lg shrink-0">
-            {wasteIcon[r.wasteType] ?? "📦"}
+            {wasteIcon[r.categorie] ?? "📦"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm truncate">{r.wasteType}</p>
+            <p className="font-semibold text-sm truncate">{r.categorie}</p>
             <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
               <MapPin className="w-3 h-3 shrink-0" />
-              {r.address}
+              {r.adresse}
             </p>
           </div>
           <div className="flex flex-col items-end gap-1.5 shrink-0">
-            <StatusBadge status={r.status} />
+            <StatusBadge status={r.statut} />
             <span className="text-xs text-muted-foreground">
-              {new Date(r.createdAt).toLocaleDateString("fr-FR")}
+              {new Date(r.date_creation).toLocaleDateString("fr-FR")}
             </span>
           </div>
           <ChevronRight className="w-4 h-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />
@@ -95,21 +90,63 @@ function ReportRow({ r, i }: { r: (typeof myReports)[0]; i: number }) {
 
 export default function CitizenDashboard() {
   const { user } = useAppStore();
+  const [signalements, setSignalements] = React.useState<Signalement[]>([]);
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
 
+  React.useEffect(() => {
+    async function getSignalements() {
+      const { data, error } = await signalementsApi.getMine();
+      setSignalements(data!);
+      console.log("latitude : ", data![0].latitude);
+    }
+    getSignalements();
+  }, []);
+
+  const myReports = signalements;
+  const pending = myReports.filter((r) => r.statut === "en_cours").length;
+  const active = myReports.filter((r) =>
+    ["nouveau", "en_cours"].includes(r.statut),
+  ).length;
+  const completed = myReports.filter((r) => r.statut === "resolu").length;
+
   const mapMarkers = myReports.map((r) => ({
     id: r.id,
-    lat: r.lat,
-    lng: r.lng,
+    lat: r.latitude! ?? 0,
+    lng: r.longitude! ?? 0,
     color:
-      r.status === "Complété"
+      r.statut === "resolu"
         ? "#16A34A"
-        : r.status === "En attente"
+        : r.statut === "en_cours"
           ? "#F59E0B"
           : "#3B82F6",
   }));
+
+  // Calculate the center from all signalements
+  // Calculate the center from all signalements
+  const getMapCenter = React.useMemo(() => {
+    if (!signalements || signalements.length === 0) {
+      return [4.0511, 9.7679] as [number, number]; // Default: Douala
+    }
+
+    const validReports = signalements.filter(
+      (r) => r.latitude && r.longitude && r.latitude !== 0 && r.longitude !== 0,
+    );
+
+    if (validReports.length === 0) {
+      return [4.0511, 9.7679] as [number, number];
+    }
+
+    const avgLat =
+      validReports.reduce((sum, r) => sum + r.latitude!, 0) /
+      validReports.length;
+    const avgLng =
+      validReports.reduce((sum, r) => sum + r.longitude!, 0) /
+      validReports.length;
+
+    return [avgLat, avgLng] as [number, number];
+  }, [signalements]);
 
   return (
     <>
@@ -149,7 +186,7 @@ export default function CitizenDashboard() {
             </div>
             <div className="flex-1 text-white">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-black text-2xl">{USER_POINTS}</span>
+                <span className="font-black text-2xl">{user?.points}</span>
                 <span className="text-white/70 text-sm">points</span>
                 <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full font-medium ml-1">
                   {USER_LEVEL}
@@ -296,7 +333,8 @@ export default function CitizenDashboard() {
                 <p className="font-bold text-lg mb-0.5">Super Citoyen 🏆</p>
                 <p className="text-white/80 text-sm">
                   Vos signalements ont permis de collecter{" "}
-                  <strong>12 dépôts</strong> ce mois-ci. Continuez comme ça !
+                  <strong>{completed} dépôts</strong> ce mois-ci. Continuez
+                  comme ça !
                 </p>
               </div>
             </div>
@@ -323,11 +361,15 @@ export default function CitizenDashboard() {
                 </span>
               </div>
             </div>
-            <MapComponent markers={mapMarkers} height="320px" />
+            <MapComponent
+              markers={mapMarkers}
+              center={getMapCenter}
+              height="320px"
+            />
           </div>
 
           {/* Quick tips */}
-          <div className="bg-card border rounded-2xl shadow-sm p-5">
+          {/* <div className="bg-card border rounded-2xl shadow-sm p-5">
             <h2 className="font-bold text-base mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary" /> Conseils pour
               gagner plus de points
@@ -381,7 +423,7 @@ export default function CitizenDashboard() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

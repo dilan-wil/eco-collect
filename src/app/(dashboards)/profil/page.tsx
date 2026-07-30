@@ -11,6 +11,9 @@ import {
   TrendingUp, Users, BarChart3, Edit3, Save
 } from "lucide-react"
 import { getInitials } from "@/lib/get-initials"
+import { useEffect, useState } from "react"
+import { signalementsApi } from "@/lib/api"
+import { Signalement } from "@/lib/types"
 
 /* ─── shared sub-components ─────────────────────────────── */
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
@@ -58,10 +61,18 @@ function NotifRow({ label, desc }: { label: string; desc: string }) {
 /* ─── role-specific panels ───────────────────────────────── */
 function CitoyenProfile({ darkMode, setDarkMode }: any) {
   const { user } = useAppStore()
+  const [signalements, setSignalement] =useState<Signalement[]>([])
+  useEffect(() => {
+    async function getSignalements(){
+      const {data, error} = await signalementsApi.getMine()
+      setSignalement(data!)
+    }
+    getSignalements()
+  }, [])
   const stats = [
-    { value: '12', label: 'Signalements', icon: Camera, color: 'bg-primary/10 text-primary' },
-    { value: '9',  label: 'Collectés',    icon: CheckCircle2, color: 'bg-green-100 text-green-700' },
-    { value: '420', label: 'Points',      icon: Star, color: 'bg-amber-100 text-amber-700' },
+    { value: signalements.length, label: 'Signalements', icon: Camera, color: 'bg-primary/10 text-primary' },
+    { value: 0,  label: 'Collectés',    icon: CheckCircle2, color: 'bg-green-100 text-green-700' },
+    { value: user?.points, label: 'Points',      icon: Star, color: 'bg-amber-100 text-amber-700' },
   ]
   return (
     <>
@@ -92,10 +103,10 @@ function CitoyenProfile({ darkMode, setDarkMode }: any) {
       <Card className="mb-4">
         <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><User className="w-4 h-4" /> Informations personnelles</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <Field label="Nom complet" defaultValue="Jean Dupont" icon={User} />
-          <Field label="Adresse e-mail" type="email" defaultValue="jean.dupont@example.com" icon={Mail} />
-          <Field label="Téléphone" defaultValue="06 12 34 56 78" icon={Phone} />
-          <Field label="Adresse" defaultValue="15 rue de la Paix, 69001 Lyon" icon={MapPin} />
+          <Field label="Nom complet" defaultValue={user?.nom_complet} icon={User} />
+          <Field label="Adresse e-mail" type="email" defaultValue={user?.email} icon={Mail} />
+          <Field label="Téléphone" defaultValue={user?.phone} icon={Phone} />
+          {/* <Field label="Adresse" defaultValue="15 rue de la Paix, 69001 Lyon" icon={MapPin} /> */}
         </CardContent>
       </Card>
       <Card className="mb-4">

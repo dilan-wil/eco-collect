@@ -4,9 +4,10 @@ import { useAppStore } from "@/lib/store"
 import { Bell, Search, Menu, ChevronDown, X } from "lucide-react"
 import { Button } from "../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { getInitials } from "@/lib/get-initials"
 
 export function Navbar() {
-  const { role, setRole, setSidebarOpen, sidebarOpen } = useAppStore()
+  const { role, setRole, user, setSidebarOpen, sidebarOpen } = useAppStore()
   const [roleMenuOpen, setRoleMenuOpen] = React.useState(false)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
 
@@ -22,7 +23,7 @@ export function Navbar() {
   }, [])
 
   const roleLabel = role === 'CITOYEN' ? 'CITOYEN' : role === 'ADMIN' ? 'Administrateur' : 'Agent'
-  const initials = role === 'CITOYEN' ? 'JD' : role === 'ADMIN' ? 'AD' : 'AG'
+  const initials = getInitials(user?.nom_complet)
 
   return (
     <header className="h-16 glass sticky top-0 z-30 flex items-center justify-between px-4 md:px-8 w-full transition-all border-b border-border/40">
