@@ -68,7 +68,7 @@ function ReportRow({ r, i }: { r: (typeof myReports)[0]; i: number }) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.05 * i }}
     >
-      <Link href={`/citoyen/signalement/${r.id}`}>
+      <Link href={`/citoyen/signalements/${r.id}`}>
         <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/60 transition-colors cursor-pointer group">
           <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-lg shrink-0">
             {wasteIcon[r.wasteType] ?? "📦"}
@@ -207,7 +207,7 @@ export default function CitizenDashboard() {
           <div className="bg-card border rounded-2xl shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b">
               <h2 className="font-bold text-base">Signalements récents</h2>
-              <Link href="/citoyen/mes-signalements">
+              <Link href="/citoyen/signalements">
                 <Button
                   variant="ghost"
                   size="sm"

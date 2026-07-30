@@ -23,6 +23,7 @@ export default function SignalementDetail() {
     async function getSignalement() {
       const { data, error } = await signalementsApi.getById(id);
       setSignalement(data);
+      console.log(data)
     }
     getSignalement();
   }, [id]);
@@ -136,14 +137,15 @@ export default function SignalementDetail() {
             import Image from "next/image"
             <div className="h-64 relative bg-gray-100 overflow-hidden">
               {signalement.fichier_url ? (
-                <Image
-                  src={signalement.fichier_url}
-                  alt={signalement.categorie}
-                  fill
-                  className="object-cover"
-                />
+                <>
+                  <Image
+                    src={signalement.fichier_url ?? ""}
+                    alt={signalement.categorie}
+                    fill
+                    className="object-cover"
+                  />
+                </>
               ) : (
-                // Fallback placeholder
                 <div
                   className={`flex items-center justify-center w-full h-full ${
                     signalement.categorie === "Plastique"
