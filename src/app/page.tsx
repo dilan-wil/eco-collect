@@ -395,7 +395,7 @@ export default function LandingPage() {
               className="text-lg md:text-xl text-white/55 max-w-2xl leading-relaxed mb-10"
             >
               EcoKamer AI connecte les citoyens, les agents de collecte et les
-              administrateurs dans une plateforme unifiée, propulsée par
+              organisations dans une plateforme unifiée, propulsée par
               l'intelligence artificielle.
             </motion.p>
 
@@ -525,7 +525,7 @@ export default function LandingPage() {
               />
               <RoleCard
                 role="ADMIN"
-                label="Administrateur"
+                label="Organisation"
                 href="/login"
                 desc="Supervisez l'ensemble des opérations, gérez les agents et visualisez les analytics de la ville."
                 gradient="bg-gradient-to-br from-blue-600 to-indigo-600"
@@ -603,7 +603,7 @@ export default function LandingPage() {
                   <StepCard
                     n="03"
                     title="Mission assignée"
-                    desc="L'administrateur valide et assigne l'intervention à l'agent disponible le plus proche avec le véhicule adapté."
+                    desc="L'Organisation valide et assigne l'intervention à l'agent disponible le plus proche avec le véhicule adapté."
                     icon={Truck}
                     color="bg-violet-600"
                   />

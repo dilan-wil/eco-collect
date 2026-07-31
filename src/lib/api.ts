@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient";
-import { Signalement, User, Vehicule } from "./types";
+import { Agent, Signalement, User, Vehicule } from "./types";
 
 /* ================= USERS ================= */
 
@@ -116,10 +116,7 @@ export const signalementsApi = {
     return { data, error };
   },
 
-  update: async (
-    id: string,
-    updates: Partial<Signalement>
-  ) => {
+  update: async (id: string, updates: Partial<Signalement>) => {
     const { data, error } = await supabase
       .from("signalements")
       .update(updates)
@@ -130,10 +127,7 @@ export const signalementsApi = {
     return { data, error };
   },
 
-  assign: async (
-    id: string,
-    agentId: string
-  ) => {
+  assign: async (id: string, agentId: string) => {
     const { data, error } = await supabase
       .from("signalements")
       .update({
@@ -147,10 +141,7 @@ export const signalementsApi = {
     return { data, error };
   },
 
-  updateStatus: async (
-    id: string,
-    statut: string
-  ) => {
+  updateStatus: async (id: string, statut: string) => {
     const { data, error } = await supabase
       .from("signalements")
       .update({
@@ -164,10 +155,7 @@ export const signalementsApi = {
   },
 
   delete: async (id: string) => {
-    const { error } = await supabase
-      .from("signalements")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("signalements").delete().eq("id", id);
 
     return { error };
   },
@@ -175,7 +163,7 @@ export const signalementsApi = {
 
 export const vehiculesApi = {
   create: async (
-    payload: Omit<Vehicule, "id" | "date_creation" | "date_modification">
+    payload: Omit<Vehicule, "id" | "date_creation" | "date_modification">,
   ) => {
     const { data, error } = await supabase
       .from("vehicules")
@@ -224,10 +212,7 @@ export const vehiculesApi = {
     return { data, error };
   },
 
-  update: async (
-    id: string,
-    updates: Partial<Vehicule>
-  ) => {
+  update: async (id: string, updates: Partial<Vehicule>) => {
     const { data, error } = await supabase
       .from("vehicules")
       .update(updates)
@@ -238,10 +223,7 @@ export const vehiculesApi = {
     return { data, error };
   },
 
-  updateStatut: async (
-    id: string,
-    statut: Vehicule["statut"]
-  ) => {
+  updateStatut: async (id: string, statut: Vehicule["statut"]) => {
     const { data, error } = await supabase
       .from("vehicules")
       .update({ statut })
@@ -252,10 +234,7 @@ export const vehiculesApi = {
     return { data, error };
   },
 
-  updateCarburant: async (
-    id: string,
-    niveau_carburant: number
-  ) => {
+  updateCarburant: async (id: string, niveau_carburant: number) => {
     const { data, error } = await supabase
       .from("vehicules")
       .update({ niveau_carburant })
@@ -266,10 +245,7 @@ export const vehiculesApi = {
     return { data, error };
   },
 
-  assignerAgent: async (
-    id: string,
-    id_agent: string | null
-  ) => {
+  assignerAgent: async (id: string, id_agent: string | null) => {
     const { data, error } = await supabase
       .from("vehicules")
       .update({ id_agent })
@@ -281,10 +257,89 @@ export const vehiculesApi = {
   },
 
   delete: async (id: string) => {
-    const { error } = await supabase
-      .from("vehicules")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("vehicules").delete().eq("id", id);
+
+    return { error };
+  },
+};
+
+export const agentsApi = {
+  create: async (payload: any) => {
+    const response = await fetch("/api/admin/agents", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    return response.json();
+  },
+
+  getAll: async () => {
+    const { data, error } = await supabase
+      .from("agents")
+      .select("*")
+      .order("date_creation", { ascending: false });
+
+    return { data, error };
+  },
+
+  getById: async (id: string) => {
+    const { data, error } = await supabase
+      .from("agents")
+      .select(
+        `
+        *,
+        utilisateur:utilisateurs(*),
+        vehicule:vehicules(*)
+      `,
+      )
+      .eq("id", id)
+      .single();
+
+    return { data, error };
+  },
+
+  getDisponibles: async () => {
+    const { data, error } = await supabase
+      .from("agents")
+      .select(
+        `
+        *,
+        utilisateur:utilisateurs(*)
+      `,
+      )
+      .eq("disponibilite", true)
+      .eq("statut", "disponible");
+
+    return { data, error };
+  },
+
+  assignerVehicule: async (id: string, vehicule_id: string | null) => {
+    const { data, error } = await supabase
+      .from("agents")
+      .update({ vehicule_id })
+      .eq("id", id)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  update: async (id: string, updates: Partial<Agent>) => {
+    const { data, error } = await supabase
+      .from("agents")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  delete: async (id: string) => {
+    const { error } = await supabase.from("agents").delete().eq("id", id);
 
     return { error };
   },

@@ -117,6 +117,9 @@ export interface Vehicule {
 
 export interface Agent {
   id: string;
+  nom_complet: string;
+  email: string;
+  phone: string;
 
   matricule: string;
 

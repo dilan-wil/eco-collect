@@ -3,9 +3,11 @@ import { Phone, Mail, Award, CheckCircle2, Clock } from "lucide-react"
 import { Card, CardContent } from "./card"
 import { StatusBadge } from "./StatusBadge"
 import { Button } from "./button"
+import { Agent } from "@/lib/types"
+import { getInitials } from "@/lib/get-initials"
 
-export function AgentCard({ agent }: { agent: any }) {
-  const isAvailable = agent.status === "Disponible"
+export function AgentCard({ agent }: { agent: Agent }) {
+  const isAvailable = agent.statut === "disponible"
   
   return (
     <Card className="overflow-hidden hover:shadow-md transition-all group">
@@ -14,21 +16,21 @@ export function AgentCard({ agent }: { agent: any }) {
           <div className="flex justify-between items-start mb-4">
             <div className="flex gap-4 items-center">
               <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-inner relative">
-                {agent.name.split(' ').map((n: string) => n[0]).join('')}
+                {getInitials(agent.nom_complet)}
                 <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-2 border-background rounded-full ${
                   isAvailable ? 'bg-green-500' : 
-                  agent.status === "En mission" ? 'bg-blue-500' : 'bg-red-500'
+                  agent.statut === "en_mission" ? 'bg-blue-500' : 'bg-red-500'
                 }`}></div>
               </div>
               <div>
-                <h3 className="font-bold text-lg">{agent.name}</h3>
+                <h3 className="font-bold text-lg">{agent.nom_complet}</h3>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
                   <Award className="w-4 h-4 text-amber-500" />
-                  <span className="font-medium text-foreground">{agent.rating}</span>/5
+                  <span className="font-medium text-foreground">4</span>/5
                 </div>
               </div>
             </div>
-            <StatusBadge status={agent.status} />
+            <StatusBadge status={agent.statut} />
           </div>
           
           <div className="space-y-2 mb-4 text-sm text-muted-foreground">
@@ -48,7 +50,7 @@ export function AgentCard({ agent }: { agent: any }) {
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span className="text-xs uppercase tracking-wider">Missions</span>
               </div>
-              <p className="font-bold text-lg">{agent.completedMissions}</p>
+              <p className="font-bold text-lg">5</p>
             </div>
             <div className="text-center border-l">
               <div className="flex justify-center items-center gap-1 text-muted-foreground mb-1">
