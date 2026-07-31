@@ -8,40 +8,44 @@ export async function POST(req: NextRequest) {
   try {
     const { image } = await req.json();
     
-    // Remove the base64 header
+    // Nettoyer l'image base64
     const base64Data = image.split(',')[1];
-    
-    // Convertir en Buffer puis en ArrayBuffer
     const buffer = Buffer.from(base64Data, 'base64');
-    const arrayBuffer = new Uint8Array(buffer).buffer;
     
+    // Créer un blob avec le bon type MIME
+    const blob = new Blob([buffer], { type: 'image/jpeg' });
+
+    // Analyser avec Hugging Face
     const result = await hf.imageClassification({
       model: "google/vit-base-patch16-224",
-      data: arrayBuffer,  // Utiliser ArrayBuffer directement
+      data: blob,
     });
-    
-    // Check if result contains waste-related labels
-    const wasteKeywords = ['trash', 'waste', 'garbage', 'plastic', 'bottle', 'can', 'paper', 'cardboard'];
+
+    // Filtrer les résultats
+    const wasteKeywords = ['trash', 'waste', 'garbage', 'plastic', 'bottle', 'can', 'paper', 'cardboard', 'litter'];
     const wasteDetections = result.filter(item => 
       wasteKeywords.some(keyword => 
         item.label.toLowerCase().includes(keyword)
       )
     );
-    
+
+    // Si pas de déchet détecté, prendre le premier résultat
     const hasWaste = wasteDetections.length > 0;
-    const confidence = hasWaste ? Math.round(wasteDetections[0].score * 100) : 0;
-    
+    const confidence = hasWaste ? Math.round(wasteDetections[0].score * 100) : 50;
+
     return NextResponse.json({
       hasWaste,
       confidence,
-      objects: wasteDetections.map(d => d.label).slice(0, 3),
+      objects: wasteDetections.length > 0 
+        ? wasteDetections.map(d => d.label).slice(0, 3)
+        : ["Aucun déchet détecté"],
       decision: hasWaste ? 'Validé' : 'Non détecté',
     });
-    
-  } catch (error) {
-    console.error(error);
+
+  } catch (error: any) {
+    console.error("Erreur:", error.message);
     return NextResponse.json(
-      { error: "Erreur d'analyse" },
+      { error: "Erreur lors de l'analyse" },
       { status: 500 }
     );
   }

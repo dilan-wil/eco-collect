@@ -237,54 +237,77 @@ export default function NouveauSignalement() {
     setPhoto(file);
     setPhotoPreview(url);
     setStep(2);
-    runAI();
+    runAI(file);
   };
 
-  const runAI = async () => {
-    if (!photo) return;
+  const runAI = async (photo: File) => {
+    console.log("🚀 Démarrage analyse...");
+
+    if (!photo) {
+      toast.error("Aucune photo à analyser");
+      return;
+    }
 
     setAiProgress(0);
 
     try {
-      // Convert to base64
       const reader = new FileReader();
       const imageBase64 = await new Promise((resolve) => {
         reader.onload = () => resolve(reader.result);
         reader.readAsDataURL(photo);
       });
 
-      // Call API
       const res = await fetch("/api/analyze-waste", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: imageBase64 }),
       });
 
-      const data = await res.json();
-      console.log(data)
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Erreur API");
+      }
 
-      // Simulate progress
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 10 + 5);
-        if (progress >= 95) {
-          clearInterval(interval);
-          setAiResult({
-            confidence: data.confidence,
-            objects: data.objects || ["Déchet détecté"],
-            decision: data.decision,
-          });
-          setStep(3);
-          setAiProgress(100);
-        } else {
-          setAiProgress(progress);
-        }
-      }, 150);
-    } catch (error) {
-      console.error("Erreur:", error);
-      toast.error("Erreur d'analyse, réessayez");
-      // Fallback: go to next step anyway
+      const data = await res.json();
+      console.log("Résultat IA:", data);
+
+      const confidence = data.confidence || 0;
+
+      // ✅ Vérification de la confiance
+      if (confidence < 90) {
+        toast.error(
+          `Qualité d'image insuffisante (${confidence}% de confiance).\nAssurez-vous que :\n• La photo est bien nette\n• Le déchet est bien visible\n• L'éclairage est suffisant`,
+          { duration: 6000 },
+        );
+
+        // Retour à l'étape 1
+        setStep(1);
+        setPhoto(null);
+        setPhotoPreview(null);
+        setAiProgress(0);
+        setAiResult(null);
+
+        // Focus sur l'input file
+        setTimeout(() => fileRef.current?.click(), 500);
+        return;
+      }
+
+      // ✅ Succès
+      setAiResult({
+        confidence: confidence,
+        objects: data.objects || ["Déchet détecté"],
+        decision: data.decision || "Validé",
+      });
+      setAiProgress(100);
       setStep(3);
+    } catch (error: any) {
+      console.error("Erreur:", error);
+      toast.error(error.message || "Erreur d'analyse, veuillez réessayer");
+      setStep(1);
+      setPhoto(null);
+      setPhotoPreview(null);
+      setAiProgress(0);
+      setAiResult(null);
     }
   };
 
@@ -325,6 +348,8 @@ export default function NouveauSignalement() {
         latitude: location?.lat,
         longitude: location?.lng,
         fichier_url: image_url,
+        confiance_ia: aiResult.confidence,
+        objets_ia: aiResult.objects,
         commentaire_public: details.description,
       });
       await userApi.update(user.id, { points: user.points + 50 });

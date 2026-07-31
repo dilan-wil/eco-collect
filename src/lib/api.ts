@@ -58,6 +58,8 @@ export const signalementsApi = {
     fichier_url?: string;
     categorie_id?: string;
     commentaire_public?: string;
+    confiance_ia: number;
+    objets_ia: string[];
   }) => {
     const { data, error } = await supabase
       .from("signalements")
