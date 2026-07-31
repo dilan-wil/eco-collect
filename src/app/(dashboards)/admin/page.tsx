@@ -256,7 +256,7 @@ export default function AdminDashboard() {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-bold">
-                  Évolution des signalements (2024)
+                  Évolution des signalements (2026)
                 </CardTitle>
                 <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full">
                   +18% vs N-1

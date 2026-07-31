@@ -139,3 +139,53 @@ export interface Agent {
   date_creation: string;
   date_modification: string;
 }
+
+// types/missions.ts
+export type MissionStatut = 'planifiee' | 'en_cours' | 'terminee' | 'annulee' | 'en_retard';
+export type MissionPriorite = 'basse' | 'normale' | 'haute' | 'critique';
+export type MissionType = 'collecte' | 'inspection' | 'maintenance' | 'urgente';
+
+export interface Mission {
+  id: string;
+  reference: string;
+  signalement_id: string;
+  agent_id: string;
+  vehicule_id: string | null;
+  date_creation: Date;
+  date_debut: Date | null;
+  date_fin_prevue: Date | null;
+  date_fin_reelle: Date | null;
+  date_derniere_mise_a_jour: Date;
+  statut: MissionStatut;
+  priorite: MissionPriorite;
+  description: string | null;
+  instructions_specifiques: string | null;
+  type_mission: MissionType | null;
+  resultat: string | null;
+  commentaires_internes: string | null;
+  commentaires_publics: string | null;
+  note_agent: number | null;
+  commentaire_evaluation: string | null;
+  metadata: any;
+  tags: string[];
+  created_by: string | null;
+  updated_by: string | null;
+  created_at: Date;
+  updated_at: Date;
+  
+  // Relations (pour les jointures)
+  signalement?: Signalement;
+  agent?: Agent;
+  vehicule?: Vehicule;
+  historique?: MissionHistorique[];
+}
+
+export interface MissionHistorique {
+  id: string;
+  mission_id: string;
+  ancien_statut: MissionStatut | null;
+  nouveau_statut: MissionStatut | null;
+  commentaire: string | null;
+  date_changement: Date;
+  change_par: string | null;
+}

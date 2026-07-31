@@ -101,7 +101,7 @@ function AIScan({ progress }: { progress: number }) {
 
 export default function NouveauSignalement() {
   const navigate = useRouter();
-  const { user } = useAppStore()
+  const { user } = useAppStore();
   const [step, setStep] = React.useState(1);
   const [photo, setPhoto] = React.useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
@@ -237,28 +237,78 @@ export default function NouveauSignalement() {
     setPhoto(file);
     setPhotoPreview(url);
     setStep(2);
-    runAI();
+    runAI(file);
   };
 
-  const runAI = () => {
+  const runAI = async (photo: File) => {
+    console.log("🚀 Démarrage analyse...");
+
+    if (!photo) {
+      toast.error("Aucune photo à analyser");
+      return;
+    }
+
     setAiProgress(0);
-    const interval = setInterval(() => {
-      setAiProgress((p) => {
-        if (p >= 97) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setAiResult({
-              confidence: 97,
-              objects: ["Sacs plastiques", "Cartons", "Bouteilles"],
-              decision: "Validé",
-            });
-            setStep(3);
-          }, 400);
-          return 97;
-        }
-        return p + Math.floor(Math.random() * 12 + 3);
+
+    try {
+      const reader = new FileReader();
+      const imageBase64 = await new Promise((resolve) => {
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(photo);
       });
-    }, 150);
+
+      const res = await fetch("/api/analyze-waste", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageBase64 }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Erreur API");
+      }
+
+      const data = await res.json();
+      console.log("Résultat IA:", data);
+
+      const confidence = data.confidence || 0;
+
+      // ✅ Vérification de la confiance
+      if (confidence < 90) {
+        toast.error(
+          `Qualité d'image insuffisante (${confidence}% de confiance).\nAssurez-vous que :\n• La photo est bien nette\n• Le déchet est bien visible\n• L'éclairage est suffisant`,
+          { duration: 6000 },
+        );
+
+        // Retour à l'étape 1
+        setStep(1);
+        setPhoto(null);
+        setPhotoPreview(null);
+        setAiProgress(0);
+        setAiResult(null);
+
+        // Focus sur l'input file
+        setTimeout(() => fileRef.current?.click(), 500);
+        return;
+      }
+
+      // ✅ Succès
+      setAiResult({
+        confidence: confidence,
+        objects: data.objects || ["Déchet détecté"],
+        decision: data.decision || "Validé",
+      });
+      setAiProgress(100);
+      setStep(3);
+    } catch (error: any) {
+      console.error("Erreur:", error);
+      toast.error(error.message || "Erreur d'analyse, veuillez réessayer");
+      setStep(1);
+      setPhoto(null);
+      setPhotoPreview(null);
+      setAiProgress(0);
+      setAiResult(null);
+    }
   };
 
   const handleFile = (file: File) => {
@@ -298,9 +348,11 @@ export default function NouveauSignalement() {
         latitude: location?.lat,
         longitude: location?.lng,
         fichier_url: image_url,
+        confiance_ia: aiResult.confidence,
+        objets_ia: aiResult.objects,
         commentaire_public: details.description,
       });
-      await userApi.update(user.id, {points: user.points+50})
+      await userApi.update(user.id, { points: user.points + 50 });
       setConfetti(true);
       setDone(true);
       setTimeout(() => setConfetti(false), 4500);
