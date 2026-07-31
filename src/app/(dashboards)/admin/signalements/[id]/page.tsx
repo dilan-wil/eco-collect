@@ -24,15 +24,16 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty"
+} from "@/components/ui/empty";
 import { Signalement } from "@/lib/types";
 import { signalementsApi } from "@/lib/api";
+import Image from "next/image";
 
 export default function SignalementDetailAdmin() {
   const navigate = useRouter();
   const params = useParams();
   const id = params.id as string;
-  const [report, setReport] = React.useState<Signalement | null>(null)
+  const [report, setReport] = React.useState<Signalement | null>(null);
   const assignedAgent = report?.assigne_a
     ? mockAgents.find((a) => a.id === report.assigne_a)
     : null;
@@ -40,12 +41,12 @@ export default function SignalementDetailAdmin() {
   const [assigned, setAssigned] = React.useState(report?.statut === "en_cours");
 
   React.useEffect(() => {
-    async function getSignalement(){
-      const { data } = await signalementsApi.getById(id)
-      setReport(data)
+    async function getSignalement() {
+      const { data } = await signalementsApi.getById(id);
+      setReport(data);
     }
-    getSignalement()
-  }, [id])
+    getSignalement();
+  }, [id]);
 
   const handleAssign = () => {
     setAssigned(true);
@@ -61,11 +62,16 @@ export default function SignalementDetailAdmin() {
           </EmptyMedia>
           <EmptyTitle>Signalements Non trouvés</EmptyTitle>
           <EmptyDescription>
-            Le signalement que vous cherchez n'existe pas, veuillez retourner au panel.
+            Le signalement que vous cherchez n'existe pas, veuillez retourner au
+            panel.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Button onClick={() => navigate.push("/admin")} variant="outline" size="sm">
+          <Button
+            onClick={() => navigate.push("/admin")}
+            variant="outline"
+            size="sm"
+          >
             Accueil
           </Button>
         </EmptyContent>
@@ -95,8 +101,7 @@ export default function SignalementDetailAdmin() {
               )}
             </div>
             <p className="text-muted-foreground flex items-center gap-2">
-              <MapPin className="w-4 h-4" /> {report.adresse} ({report.ville}
-              )
+              <MapPin className="w-4 h-4" /> {report.adresse} ({report.ville})
             </p>
           </div>
 
@@ -177,8 +182,18 @@ export default function SignalementDetailAdmin() {
         <div className="lg:col-span-2 space-y-8">
           {/* Main Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="h-64 rounded-xl border bg-muted flex items-center justify-center text-4xl font-bold opacity-80 uppercase tracking-widest text-muted-foreground/50">
-              {report.categorie} PHOTO
+            <div className="relative h-64 w-full rounded-xl border bg-muted flex items-center justify-center text-4xl font-bold uppercase tracking-widest text-muted-foreground/50 overflow-hidden">
+              {report.fichier_url ? (
+                <Image
+                  src={report?.fichier_url! ?? ""}
+                  alt={report.categorie}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              ) : (
+                <span>{report.categorie} PHOTO</span>
+              )}
             </div>
             <div className="space-y-6">
               <Card className="shadow-sm">
@@ -211,7 +226,9 @@ export default function SignalementDetailAdmin() {
                       <span className="text-muted-foreground">
                         Volume estimé
                       </span>
-                      <span className="font-medium">{report.niveau_accumulation}</span>
+                      <span className="font-medium">
+                        {report.niveau_accumulation}
+                      </span>
                     </div>
                   </div>
                 </CardContent>

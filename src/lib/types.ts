@@ -87,3 +87,51 @@ export interface Signalement {
   commentaire_interne: string | null;
   commentaire_public: string | null;
 }
+
+export interface Vehicule {
+  id: string;
+
+  immatriculation: string;
+  type: string;
+  capacite: string;
+
+  niveau_carburant: number;
+
+  statut:
+    | "disponible"
+    | "en_service"
+    | "en_maintenance";
+
+  id_agent?: string | null;
+
+  statut_maintenance:
+    | "a_jour"
+    | "bientot_requise"
+    | "en_cours";
+
+  date_derniere_maintenance?: string | null;
+
+  date_creation: string;
+  date_modification: string;
+}
+
+export interface Agent {
+  id: string;
+
+  matricule: string;
+
+  statut:
+    | "disponible"
+    | "en_mission"
+    | "hors_service"
+    | "conge";
+
+  disponibilite: boolean;
+
+  zone_intervention?: string | null;
+
+  date_embauche?: string | null;
+
+  date_creation: string;
+  date_modification: string;
+}

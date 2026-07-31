@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient";
-import { Signalement, User } from "./types";
+import { Signalement, User, Vehicule } from "./types";
 
 /* ================= USERS ================= */
 
@@ -166,6 +166,123 @@ export const signalementsApi = {
   delete: async (id: string) => {
     const { error } = await supabase
       .from("signalements")
+      .delete()
+      .eq("id", id);
+
+    return { error };
+  },
+};
+
+export const vehiculesApi = {
+  create: async (
+    payload: Omit<Vehicule, "id" | "date_creation" | "date_modification">
+  ) => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .insert(payload)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  getAll: async () => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .select("*")
+      .order("date_creation", { ascending: false });
+
+    return { data, error };
+  },
+
+  getById: async (id: string) => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    return { data, error };
+  },
+
+  getDisponible: async () => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .select("*")
+      .eq("statut", "disponible")
+      .order("immatriculation");
+
+    return { data, error };
+  },
+
+  getByAgent: async (agentId: string) => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .select("*")
+      .eq("id_agent", agentId);
+
+    return { data, error };
+  },
+
+  update: async (
+    id: string,
+    updates: Partial<Vehicule>
+  ) => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  updateStatut: async (
+    id: string,
+    statut: Vehicule["statut"]
+  ) => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .update({ statut })
+      .eq("id", id)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  updateCarburant: async (
+    id: string,
+    niveau_carburant: number
+  ) => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .update({ niveau_carburant })
+      .eq("id", id)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  assignerAgent: async (
+    id: string,
+    id_agent: string | null
+  ) => {
+    const { data, error } = await supabase
+      .from("vehicules")
+      .update({ id_agent })
+      .eq("id", id)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  delete: async (id: string) => {
+    const { error } = await supabase
+      .from("vehicules")
       .delete()
       .eq("id", id);
 
