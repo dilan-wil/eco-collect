@@ -1,24 +1,27 @@
 "use client"
 import * as React from "react"
-import { mockReports } from "@/lib/mockData"
 import { MapComponent } from "@/components/ui/MapComponent"
 import { Card, CardContent } from "@/components/ui/card"
 import { Filter, Layers, Zap } from "lucide-react"
+import { useAppStore } from "@/lib/store"
+import { useRouter } from "next/navigation"
 
 export default function CarteAdmin() {
-  const mapMarkers = mockReports.map(r => ({
+  const navigate = useRouter()
+  const { signalements } = useAppStore()
+  const mapMarkers = signalements.map(r => ({
     id: r.id,
-    lat: r.lat,
-    lng: r.lng,
-    color: r.status === 'Complété' ? '#16A34A' : r.status === 'En attente' ? '#F59E0B' : r.priority === 'Critique' ? '#EF4444' : '#3B82F6',
+    lat: r.latitude ?? 4,
+    lng: r.longitude ?? 9,
+    color: r.statut === 'resolu' ? '#16A34A' : r.statut === 'nouveau' ? '#F59E0B' : r.priorite === 'critique' ? '#EF4444' : '#3B82F6',
     popup: (
       <div className="p-2 min-w-[200px]">
         <div className="flex justify-between items-start mb-2">
-          <p className="font-bold text-sm">{r.wasteType}</p>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted font-medium">{r.status}</span>
+          <p className="font-bold text-sm">{r.categorie}</p>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted font-medium">{r.statut}</span>
         </div>
-        <p className="text-xs text-muted-foreground mb-3">{r.address}</p>
-        <button className="w-full py-1.5 bg-primary/10 text-primary text-xs font-semibold rounded hover:bg-primary/20 transition-colors">
+        <p className="text-xs text-muted-foreground mb-3">{r.adresse}</p>
+        <button onClick={() => navigate.push(`/admin/signalements/${r.id}`)} className="w-full py-1.5 bg-primary/10 text-primary text-xs font-semibold rounded hover:bg-primary/20 transition-colors">
           Voir détails
         </button>
       </div>
@@ -53,15 +56,15 @@ export default function CarteAdmin() {
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 rounded-full bg-amber-500 ring-2 ring-background shadow-sm"></div>
-                    <span>En attente ({mockReports.filter(r => r.status === 'En attente').length})</span>
+                    <span>En attente ({signalements.filter(r => r.statut === 'nouveau').length})</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 rounded-full bg-blue-500 ring-2 ring-background shadow-sm"></div>
-                    <span>Assigné / En cours ({mockReports.filter(r => r.status === 'Assigné' || r.status === 'En cours').length})</span>
+                    <span>Assigné / En cours ({signalements.filter(r => r.statut === 'en_cours').length})</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 rounded-full bg-green-500 ring-2 ring-background shadow-sm"></div>
-                    <span>Complété ({mockReports.filter(r => r.status === 'Complété').length})</span>
+                    <span>Complété ({signalements.filter(r => r.statut === 'resolu').length})</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 rounded-full bg-red-500 ring-2 ring-background shadow-sm"></div>
