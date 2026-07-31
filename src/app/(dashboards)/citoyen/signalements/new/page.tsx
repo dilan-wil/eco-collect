@@ -101,7 +101,7 @@ function AIScan({ progress }: { progress: number }) {
 
 export default function NouveauSignalement() {
   const navigate = useRouter();
-  const { user } = useAppStore()
+  const { user } = useAppStore();
   const [step, setStep] = React.useState(1);
   const [photo, setPhoto] = React.useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
@@ -240,25 +240,52 @@ export default function NouveauSignalement() {
     runAI();
   };
 
-  const runAI = () => {
+  const runAI = async () => {
+    if (!photo) return;
+
     setAiProgress(0);
-    const interval = setInterval(() => {
-      setAiProgress((p) => {
-        if (p >= 97) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setAiResult({
-              confidence: 97,
-              objects: ["Sacs plastiques", "Cartons", "Bouteilles"],
-              decision: "Validé",
-            });
-            setStep(3);
-          }, 400);
-          return 97;
-        }
-        return p + Math.floor(Math.random() * 12 + 3);
+
+    try {
+      // Convert to base64
+      const reader = new FileReader();
+      const imageBase64 = await new Promise((resolve) => {
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(photo);
       });
-    }, 150);
+
+      // Call API
+      const res = await fetch("/api/analyze-waste", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageBase64 }),
+      });
+
+      const data = await res.json();
+      console.log(data)
+
+      // Simulate progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 10 + 5);
+        if (progress >= 95) {
+          clearInterval(interval);
+          setAiResult({
+            confidence: data.confidence,
+            objects: data.objects || ["Déchet détecté"],
+            decision: data.decision,
+          });
+          setStep(3);
+          setAiProgress(100);
+        } else {
+          setAiProgress(progress);
+        }
+      }, 150);
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast.error("Erreur d'analyse, réessayez");
+      // Fallback: go to next step anyway
+      setStep(3);
+    }
   };
 
   const handleFile = (file: File) => {
@@ -300,7 +327,7 @@ export default function NouveauSignalement() {
         fichier_url: image_url,
         commentaire_public: details.description,
       });
-      await userApi.update(user.id, {points: user.points+50})
+      await userApi.update(user.id, { points: user.points + 50 });
       setConfetti(true);
       setDone(true);
       setTimeout(() => setConfetti(false), 4500);
