@@ -1,6 +1,7 @@
 // types/signalements.ts
 
 export type Categorie = 
+  | 'Ménager'
   | 'Plastique'
   | 'Organique'
   | 'Construction'
