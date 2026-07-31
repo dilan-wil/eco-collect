@@ -144,7 +144,7 @@ export default function Register() {
           >
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold tracking-tight mb-2">Créer un compte</h1>
-              <p className="text-muted-foreground">Rejoignez la communauté EcoKamer AI et aidez à garder Lyon propre</p>
+              <p className="text-muted-foreground">Rejoignez la communauté EcoKamer AI et aidez à garder Douala propre</p>
             </div>
 
             <div className="bg-card border rounded-2xl shadow-lg p-8">

@@ -9,6 +9,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { useAppStore } from "@/lib/store"
 
 const COLORS = ['#16A34A', '#2563EB', '#F59E0B', '#EF4444', '#8B5CF6', '#64748B']
 
@@ -63,8 +64,8 @@ function AgentStatusDot({ status }: { status: string }) {
 }
 
 export default function AdminDashboard() {
+  const { signalements } = useAppStore()
   const urgent = mockReports.filter(r => r.priority === 'Critique' && r.status !== 'Complété')
-
   const radialData = [
     { name: 'Taux', value: mockStats.successRate, fill: '#16A34A' },
   ]
@@ -79,20 +80,20 @@ export default function AdminDashboard() {
             <span className="text-xs font-semibold text-green-600 uppercase tracking-wider">Opérations en direct</span>
           </div>
           <h1 className="text-3xl font-black tracking-tight">Mission Control</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Lyon Métropole · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          <p className="text-muted-foreground mt-1 text-sm">Douala Métropole · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
         </div>
-        <div className="hidden md:flex items-center gap-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl px-4 py-2.5">
+        {/* <div className="hidden md:flex items-center gap-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl px-4 py-2.5">
           <CheckCircle2 className="w-5 h-5 text-green-600" />
           <div>
             <p className="text-lg font-black text-green-700">{mockStats.todayCompleted}</p>
             <p className="text-xs text-green-600 font-medium">collectes aujourd'hui</p>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* KPI Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <MetricCard label="Signalements totaux" value={mockStats.totalReports.toLocaleString()} trend={12.5} color="bg-primary" icon={FileText} delay={0} />
+        <MetricCard label="Signalements totaux" value={signalements?.length} trend={12.5} color="bg-primary" icon={FileText} delay={0} />
         <MetricCard label="Agents actifs" value={`${mockStats.activeAgents}`} sub="sur 52 disponibles" color="bg-blue-600" icon={Users} delay={0.05} />
         <MetricCard label="Validation IA" value={`${mockStats.aiValidationRate}%`} trend={2.1} color="bg-violet-600" icon={BrainCircuit} delay={0.1} />
         <MetricCard label="Temps moyen" value={`${mockStats.avgResponseTime}h`} trend={-4} color="bg-amber-500" icon={Clock} delay={0.15} />

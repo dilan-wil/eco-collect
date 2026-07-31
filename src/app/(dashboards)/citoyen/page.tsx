@@ -156,7 +156,7 @@ export default function CitizenDashboard() {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
       >
-        <div>
+        <div className="w-full">
           <p className="text-muted-foreground text-sm font-medium mb-0.5">
             {greeting} 👋
           </p>

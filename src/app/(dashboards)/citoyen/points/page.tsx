@@ -140,7 +140,7 @@ export default function Points() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Mes Points</h1>
         <p className="text-muted-foreground mt-1">
-          Gagnez des points en contribuant à la propreté de Lyon.
+          Gagnez des points en contribuant à la propreté de Douala.
         </p>
       </div>
 

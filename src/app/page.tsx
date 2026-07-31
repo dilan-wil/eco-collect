@@ -329,7 +329,7 @@ export default function LandingPage() {
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-sm font-semibold mb-8"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              Plateforme de gestion intelligente des déchets · Lyon
+              Plateforme de gestion intelligente des déchets · Douala
             </motion.div>
 
             {/* Headline */}

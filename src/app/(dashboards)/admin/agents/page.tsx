@@ -193,9 +193,11 @@ export default function Agents() {
 
                   <Field label="Organisation">
                     <select value={form.organizationId} onChange={set('organizationId')} className={fieldClass(false)}>
-                      <option value="ORG-001">EcoKamer Lyon Centre</option>
-                      <option value="ORG-002">EcoKamer Lyon Est</option>
-                      <option value="ORG-003">EcoKamer Lyon Ouest</option>
+                      <option value="ORG-001">EcoKamer Douala I</option>
+                      <option value="ORG-002">EcoKamer Douala II</option>
+                      <option value="ORG-003">EcoKamer Douala III</option>
+                      <option value="ORG-004">EcoKamer Douala IV</option>
+                      <option value="ORG-005">EcoKamer Douala V</option>
                     </select>
                   </Field>
 

@@ -106,7 +106,7 @@ function CitoyenProfile({ darkMode, setDarkMode }: any) {
           <Field label="Nom complet" defaultValue={user?.nom_complet} icon={User} />
           <Field label="Adresse e-mail" type="email" defaultValue={user?.email} icon={Mail} />
           <Field label="Téléphone" defaultValue={user?.phone} icon={Phone} />
-          {/* <Field label="Adresse" defaultValue="15 rue de la Paix, 69001 Lyon" icon={MapPin} /> */}
+          {/* <Field label="Adresse" defaultValue="15 rue de la Paix, 69001 Douala" icon={MapPin} /> */}
         </CardContent>
       </Card>
       <Card className="mb-4">
@@ -142,9 +142,9 @@ function AdminProfile({ darkMode, setDarkMode }: any) {
       <Card className="mb-4">
         <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><Shield className="w-4 h-4 text-blue-600" /> Compte Administrateur</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <Field label="Nom complet" defaultValue="Admin Lyon Métropole" icon={User} />
-          <Field label="E-mail officiel" type="email" defaultValue="admin@lyon-metropole.fr" icon={Mail} />
-          <Field label="Organisation" defaultValue="Métropole de Lyon - Propreté" icon={MapPin} />
+          <Field label="Nom complet" defaultValue="Admin Douala Métropole" icon={User} />
+          <Field label="E-mail officiel" type="email" defaultValue="admin@douala.cm" icon={Mail} />
+          <Field label="Organisation" defaultValue="Métropole de Douala - Propreté" icon={MapPin} />
           <Field label="Identifiant admin" defaultValue="ADM-001" icon={Shield} />
         </CardContent>
       </Card>
@@ -245,7 +245,7 @@ function DarkModeCard({ darkMode, setDarkMode }: any) {
 /* ─── avatars per role ───────────────────────────────────── */
 const PROFILES = {
   CITOYEN: { name: 'Jean Dupont',       initials: 'JD', title: 'Citoyen Actif',         subtitle: 'Gardien Vert 🌿',  gradient: 'from-primary to-secondary' },
-  ADMIN:   { name: 'Admin Lyon Métr.',  initials: 'AD', title: 'Administrateur',         subtitle: 'Accès complet 🔐', gradient: 'from-blue-500 to-violet-600' },
+  ADMIN:   { name: 'Admin Douala Métr.',  initials: 'AD', title: 'Administrateur',         subtitle: 'Accès complet 🔐', gradient: 'from-blue-500 to-violet-600' },
   AGENT:   { name: 'Jean Dupont',       initials: 'JD', title: 'Agent de Collecte',      subtitle: 'Note: ⭐ 4.8/5',   gradient: 'from-emerald-500 to-teal-600' },
 }
 
