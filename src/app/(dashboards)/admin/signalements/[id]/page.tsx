@@ -28,6 +28,7 @@ import {
 import { Signalement } from "@/lib/types";
 import { signalementsApi } from "@/lib/api";
 import Image from "next/image";
+import { AssignModal } from "@/components/ui/AssignModal";
 
 export default function SignalementDetailAdmin() {
   const navigate = useRouter();
@@ -52,6 +53,11 @@ export default function SignalementDetailAdmin() {
     setAssigned(true);
     setShowAssignDialog(false);
   };
+
+  const handleReject = async () => {
+    if(!report) return
+    await signalementsApi.updateStatus(report?.id, "rejete")
+  }
 
   if (!report) {
     return (
@@ -111,10 +117,11 @@ export default function SignalementDetailAdmin() {
                 <Button
                   variant="outline"
                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={handleReject}
                 >
                   Rejeter
                 </Button>
-                {!assigned && (
+                {report.statut === "nouveau" && (
                   <Button
                     onClick={() => setShowAssignDialog(true)}
                     className="gap-2"
@@ -127,56 +134,6 @@ export default function SignalementDetailAdmin() {
           </div>
         </div>
       </div>
-
-      {showAssignDialog && (
-        <div className="mb-8 p-6 bg-card border rounded-xl shadow-lg ring-1 ring-primary/20 animate-in fade-in slide-in-from-top-4">
-          <h3 className="text-lg font-bold mb-4">
-            Assigner une équipe d'intervention
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  Agent disponible suggéré
-                </label>
-                <select className="w-full border rounded-md h-10 px-3 bg-background">
-                  {mockAgents
-                    .filter((a) => a.status === "Disponible")
-                    .map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name} ({a.completedMissions} missions)
-                      </option>
-                    ))}
-                  <option>Assigner à n'importe quel agent</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  Véhicule adapté (Capacité: {report.niveau_accumulation})
-                </label>
-                <select className="w-full border rounded-md h-10 px-3 bg-background">
-                  {mockVehicles
-                    .filter((v) => v.status === "Disponible")
-                    .map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.type} - {v.registration}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex items-end justify-end gap-3">
-              <Button
-                variant="ghost"
-                onClick={() => setShowAssignDialog(false)}
-              >
-                Annuler
-              </Button>
-              <Button onClick={handleAssign}>Confirmer l'assignation</Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
@@ -343,6 +300,9 @@ export default function SignalementDetailAdmin() {
           </Card>
         </div>
       </div>
+      {showAssignDialog && report && (
+        <AssignModal report={report} onClose={() => {setShowAssignDialog(false)}} />
+      )}
     </>
   );
 }
