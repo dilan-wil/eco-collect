@@ -65,7 +65,7 @@ function AgentStatusDot({ status }: { status: string }) {
 
 export default function AdminDashboard() {
   const { signalements } = useAppStore()
-  const urgent = mockReports.filter(r => r.priority === 'Critique' && r.status !== 'Complété')
+  const urgent = signalements.filter(r => r.priorite === 'critique' && r.statut !== 'resolu' && r.statut !== 'ferme' && r.statut !== 'rejete')
   const radialData = [
     { name: 'Taux', value: mockStats.successRate, fill: '#16A34A' },
   ]
@@ -246,13 +246,13 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="flex-1 space-y-3 overflow-y-auto">
               {urgent.map((r) => (
-                <Link key={r.id} href={`/admin/signalement/${r.id}`}>
+                <Link key={r.id} href={`/admin/signalements/${r.id}`}>
                   <div className="p-3 rounded-lg border border-destructive/20 bg-destructive/5 hover:bg-destructive/10 transition-colors cursor-pointer">
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <span className="font-semibold text-sm">{r.wasteType}</span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-white shrink-0">{r.priority}</span>
+                      <span className="font-semibold text-sm">{r.categorie}</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-white shrink-0">{r.priorite}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">{r.address}</p>
+                    <p className="text-xs text-muted-foreground truncate">{r.adresse}</p>
                   </div>
                 </Link>
               ))}

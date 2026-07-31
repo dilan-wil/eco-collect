@@ -57,7 +57,7 @@ export interface User {
   email: string;
   nom_complet: string;
   phone?: string;
-  role: string;
+  role: "ADMIN" | "CITOYEN" | "AGENT";
   avatar: string;
   points: number;
   created_at: string;
