@@ -76,6 +76,7 @@ export interface Signalement {
   ville: string | null;
   code_postal: string | null;
   confiance_ia: number;
+  objets_ia: [];
   pays: string;
   latitude: number | null;
   longitude: number | null;

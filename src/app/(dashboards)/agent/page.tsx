@@ -11,6 +11,9 @@ import {
   MapPin, Navigation, CheckCircle2, Clock, Truck,
   Fuel, ChevronRight, AlertTriangle, Play, Star
 } from "lucide-react"
+import { Mission } from "@/lib/types"
+import { missionsApi } from "@/lib/api"
+import { useAuth } from "@/contexts/auth-context"
 
 const priorityColor: Record<string, string> = {
   Critique: 'bg-red-100 text-red-700 border-red-200',
@@ -26,20 +29,30 @@ const stopColor = (status: string) => {
 }
 
 export default function AgentDashboard() {
-  const myMissions = mockReports.filter(r => r.agentId === "AGT-001" && r.status !== 'Rejeté')
-  const completed  = myMissions.filter(r => r.status === 'Complété').length
-  const inProgress = myMissions.filter(r => r.status === 'En cours').length
-  const remaining  = myMissions.length - completed
-  const progress   = Math.round((completed / myMissions.length) * 100)
+  const { user } = useAuth()
+  const [missions, setMissions] = React.useState<Mission[]>([])
+  const completed  = missions.filter(r => r.statut === 'terminee').length
+  const inProgress = missions.filter(r => r.statut === 'en_cours').length
+  const remaining  = missions.length - completed
+  const progress   = Math.round((completed / missions.length) * 100)
 
-  const vehicle = mockVehicles[0]
+  const vehicle = missions[0]?.vehicule
 
-  const mapMarkers = myMissions.map(r => ({
+  const mapMarkers = missions.map(r => ({
     id: r.id,
-    lat: r.lat,
-    lng: r.lng,
-    color: r.status === 'Complété' ? '#22C55E' : r.status === 'En cours' ? '#3B82F6' : '#F59E0B'
+    lat: r.signalement?.latitude ?? 4,
+    lng: r.signalement?.longitude ?? 9,
+    color: r.statut === 'terminee' ? '#22C55E' : r.statut === 'en_cours' ? '#3B82F6' : '#F59E0B'
   }))
+
+  React.useEffect(() => {
+    if(!user) return
+    const getMissions = async () => {
+      const { data } = await missionsApi.getByAgent(user.id)
+      setMissions(data)
+    }
+    getMissions()
+  }, [user])
 
   return (
     <>
@@ -95,12 +108,12 @@ export default function AgentDashboard() {
           className="sm:col-span-2 grid grid-cols-3 gap-3"
         >
           {[
-            { label: "Missions", value: myMissions.length, icon: CheckCircle2, color: 'text-primary' },
+            { label: "Missions", value: missions.length, icon: CheckCircle2, color: 'text-primary' },
             { label: "En cours",  value: inProgress,           icon: Play,          color: 'text-blue-500' },
             { label: "Distance",  value: "14 km",              icon: Navigation,    color: 'text-violet-500' },
             { label: "Durée est.", value: "~3h",               icon: Clock,         color: 'text-amber-500' },
             { label: "Score jour", value: "96%",              icon: Star,          color: 'text-green-600' },
-            { label: "Alertes",   value: myMissions.filter(r => r.priority === 'Critique').length, icon: AlertTriangle, color: 'text-red-500' },
+            { label: "Alertes",   value: missions.filter(r => r.signalement?.priorite === 'critique').length, icon: AlertTriangle, color: 'text-red-500' },
           ].map((s, i) => (
             <Card key={i}>
               <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1">
@@ -127,18 +140,18 @@ export default function AgentDashboard() {
                 <Truck className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm">{vehicle.type} · {vehicle.registration}</p>
-                <p className="text-xs text-muted-foreground">{vehicle.capacity} · Maintenance : {vehicle.maintenanceStatus}</p>
+                <p className="font-bold text-sm">{vehicle?.type} · {vehicle?.immatriculation}</p>
+                <p className="text-xs text-muted-foreground">{vehicle?.capacite} · Maintenance : {vehicle?.statut_maintenance}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Fuel className="w-4 h-4 text-muted-foreground" />
                 <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full ${vehicle.fuelLevel > 50 ? 'bg-green-500' : vehicle.fuelLevel > 20 ? 'bg-amber-500' : 'bg-red-500'}`}
-                    style={{ width: `${vehicle.fuelLevel}%` }}
+                    className={`h-full rounded-full ${vehicle && vehicle?.niveau_carburant > 50 ? 'bg-green-500' : vehicle && vehicle?.niveau_carburant > 20 ? 'bg-amber-500' : 'bg-red-500'}`}
+                    style={{ width: `${vehicle?.niveau_carburant}%` }}
                   />
                 </div>
-                <span className="text-xs font-bold">{vehicle.fuelLevel}%</span>
+                <span className="text-xs font-bold">{vehicle?.niveau_carburant}%</span>
               </div>
             </div>
           </CardContent>
@@ -160,9 +173,9 @@ export default function AgentDashboard() {
             <div className="absolute left-[22px] top-6 bottom-6 w-0.5 bg-border" />
 
             <div className="space-y-3">
-              {myMissions.map((mission, idx) => {
-                const isDone = mission.status === 'Complété'
-                const isCurrent = mission.status === 'En cours'
+              {missions.map((mission, idx) => {
+                const isDone = mission.statut === 'terminee'
+                const isCurrent = mission.statut === 'en_cours'
 
                 return (
                   <motion.div
@@ -186,14 +199,14 @@ export default function AgentDashboard() {
 
                       {/* Card */}
                       <Card className={`flex-1 overflow-hidden transition-all ${isCurrent ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'} ${isDone ? 'bg-muted/30' : ''}`}>
-                        <div className={`h-1 w-full ${stopColor(mission.status)}`} />
+                        <div className={`h-1 w-full ${stopColor(mission.statut)}`} />
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-bold text-sm">{mission.wasteType}</span>
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${priorityColor[mission.priority]}`}>
-                                  {mission.priority}
+                                <span className="font-bold text-sm">{mission.signalement?.categorie}</span>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${priorityColor[mission.signalement?.priorite ?? "basse"]}`}>
+                                  {mission.signalement?.priorite}
                                 </span>
                                 {isCurrent && (
                                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500 text-white animate-pulse">
@@ -203,10 +216,10 @@ export default function AgentDashboard() {
                               </div>
                               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                                 <MapPin className="w-3 h-3 shrink-0" />
-                                <span className="truncate">{mission.address}</span>
+                                <span className="truncate">{mission.signalement?.adresse}</span>
                               </p>
                             </div>
-                            <StatusBadge status={mission.status} />
+                            <StatusBadge status={mission.statut} />
                           </div>
 
                           {!isDone && (

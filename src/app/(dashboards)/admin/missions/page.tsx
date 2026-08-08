@@ -6,9 +6,22 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Search, MapPin, Clock, Truck, MoreHorizontal } from "lucide-react"
+import { Mission } from "@/lib/types"
+import { missionsApi } from "@/lib/api"
+import { useRouter } from "next/navigation"
 
 export default function Missions() {
-  const missions = mockReports.filter(r => ['Assigné', 'En cours', 'Complété'].includes(r.status))
+  const router = useRouter()
+  const [missions, setMissions] = React.useState<Mission[]>([])
+
+  React.useEffect(() => {
+    async function getMissions(){
+      const {data} = await missionsApi.getAll()
+      setMissions(data)
+    }
+
+    getMissions()
+  }, [])
   
   return (
     <>
@@ -17,7 +30,7 @@ export default function Missions() {
           <h1 className="text-3xl font-bold tracking-tight">Missions de Collecte</h1>
           <p className="text-muted-foreground mt-1">Suivi des interventions sur le terrain.</p>
         </div>
-        <Button className="shrink-0">Nouvelle tournée</Button>
+        {/* <Button className="shrink-0">Nouvelle tournée</Button> */}
       </div>
 
       <div className="mb-6 flex gap-4">
@@ -29,20 +42,20 @@ export default function Missions() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {missions.map(mission => {
-          const agent = mission.agentId ? mockAgents.find(a => a.id === mission.agentId) : null
+          const agent = mission.agent_id ? mockAgents.find(a => a.id === mission.agent_id) : null
           return (
-            <Card key={mission.id} className="overflow-hidden hover:shadow-md transition-shadow">
-              <div className={`h-1.5 w-full ${mission.status === 'Complété' ? 'bg-green-500' : mission.status === 'En cours' ? 'bg-blue-500' : 'bg-amber-500'}`}></div>
+            <Card onClick={() => router.push(`/admin/missions/${mission.id}`)} key={mission.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <div className={`h-1.5 w-full ${mission.statut === 'terminee' ? 'bg-green-500' : mission.statut === 'en_cours' ? 'bg-blue-500' : 'bg-amber-500'}`}></div>
               <CardContent className="p-5">
                 <div className="flex justify-between items-start mb-4">
-                  <StatusBadge status={mission.status} />
+                  <StatusBadge status={mission.statut} />
                   <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2">
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </div>
                 
-                <h3 className="font-bold mb-1 truncate">{mission.wasteType}</h3>
-                <p className="text-sm text-muted-foreground mb-4 h-10 line-clamp-2">{mission.address}</p>
+                <h3 className="font-bold mb-1 truncate">{mission.signalement?.categorie}</h3>
+                <p className="text-sm text-muted-foreground mb-4 h-10 line-clamp-2">{mission.signalement?.adresse}</p>
                 
                 <div className="space-y-3 text-sm border-t pt-4">
                   <div className="flex items-center justify-between">

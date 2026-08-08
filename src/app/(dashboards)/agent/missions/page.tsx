@@ -9,6 +9,9 @@ import {
   Search, Filter, MapPin, Clock, AlertTriangle,
   ChevronRight, CheckCircle2, Loader2, Navigation
 } from "lucide-react"
+import { Mission } from "@/lib/types"
+import { missionsApi } from "@/lib/api"
+import { useAuth } from "@/contexts/auth-context"
 
 const STATUS_TABS = ['Toutes', 'Assigné', 'En cours', 'Complété']
 
@@ -20,21 +23,32 @@ const priorityColor: Record<string, string> = {
 }
 
 export default function AgentMissions() {
-  const allMissions = mockReports.filter(r => ['Assigné', 'En cours', 'Complété'].includes(r.status))
+  const [missions, setMissions] = React.useState<Mission[]>([])
+  const { user } = useAuth()
   const [tab, setTab] = React.useState('Toutes')
   const [search, setSearch] = React.useState('')
 
-  const filtered = allMissions.filter(m => {
-    if (tab !== 'Toutes' && m.status !== tab) return false
-    if (search && !m.address.toLowerCase().includes(search.toLowerCase()) && !m.wasteType.toLowerCase().includes(search.toLowerCase())) return false
+  React.useEffect(() => {
+    async function getMyMissions(){
+      if(!user) return
+      const { data } = await missionsApi.getByAgent(user.id)
+      setMissions(data)
+    }
+
+    getMyMissions()
+  }, [user])
+
+  const filtered = missions.filter(m => {
+    if (tab !== 'Toutes' && m.statut !== tab) return false
+    if (search && !m.statut.toLowerCase().includes(search.toLowerCase()) && !m.signalement?.categorie.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
   const counts = {
-    Toutes: allMissions.length,
-    Assigné: allMissions.filter(m => m.status === 'Assigné').length,
-    'En cours': allMissions.filter(m => m.status === 'En cours').length,
-    Complété: allMissions.filter(m => m.status === 'Complété').length,
+    Toutes: missions.length,
+    Planifié: missions.filter(m => m.statut === 'planifiee').length,
+    'En cours': missions.filter(m => m.statut === 'en_cours').length,
+    Complété: missions.filter(m => m.statut === 'terminee').length,
   }
 
   return (
@@ -83,8 +97,8 @@ export default function AgentMissions() {
       {/* Mission list */}
       <div className="space-y-3">
         {filtered.map((mission, i) => {
-          const isActive = mission.status === 'En cours'
-          const isDone = mission.status === 'Complété'
+          const isActive = mission.statut === 'en_cours'
+          const isDone = mission.statut === 'terminee'
           return (
             <motion.div key={mission.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
               <div className={`bg-card border rounded-2xl overflow-hidden transition-shadow hover:shadow-md ${isActive ? 'border-blue-300 ring-1 ring-blue-200' : ''}`}>
@@ -106,16 +120,16 @@ export default function AgentMissions() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-bold text-sm">{mission.id}</span>
-                        <StatusBadge status={mission.status} />
-                        <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${priorityColor[mission.priority]}`}>
-                          {mission.priority === 'Critique' && <AlertTriangle className="w-3 h-3 inline mr-1" />}
-                          {mission.priority}
+                        <StatusBadge status={mission.statut} />
+                        <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${priorityColor[mission.signalement?.priorite ?? "basse"]}`}>
+                          {mission.signalement?.priorite === 'critique' && <AlertTriangle className="w-3 h-3 inline mr-1" />}
+                          {mission.signalement?.priorite}
                         </span>
                       </div>
-                      <p className="font-semibold">{mission.wasteType} — {mission.volume}</p>
+                      <p className="font-semibold">{mission.signalement?.categorie} — {mission.signalement?.niveau_accumulation}</p>
                       <p className="text-sm text-muted-foreground flex items-start gap-1.5 mt-1">
                         <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
-                        <span className="line-clamp-1">{mission.address}</span>
+                        <span className="line-clamp-1">{mission.signalement?.adresse}</span>
                       </p>
                     </div>
 
@@ -125,7 +139,7 @@ export default function AgentMissions() {
                         <Clock className="w-3 h-3" /> 45 min
                       </p>
                       {!isDone && (
-                        <Link href={`/agent/mission/${mission.id}`}>
+                        <Link href={`/agent/missions/${mission.id}`}>
                           <Button size="sm" variant={isActive ? 'default' : 'outline'} className="gap-1">
                             {isActive ? 'Continuer' : 'Détails'} <ChevronRight className="w-3.5 h-3.5" />
                           </Button>

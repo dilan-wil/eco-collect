@@ -351,15 +351,17 @@ export const missionsApi = {
   // Créer une mission
   create: async (data: any) => {
     const { data: mission, error } = await supabase
-      .from('missions')
-      .insert([{
-        ...data,
-        date_creation: new Date().toISOString(),
-        date_derniere_mise_a_jour: new Date().toISOString(),
-      }])
+      .from("missions")
+      .insert([
+        {
+          ...data,
+          date_creation: new Date().toISOString(),
+          date_derniere_mise_a_jour: new Date().toISOString(),
+        },
+      ])
       .select()
       .single();
-    
+
     if (error) throw error;
     return { data: mission };
   },
@@ -367,15 +369,36 @@ export const missionsApi = {
   // Obtenir toutes les missions
   getAll: async () => {
     const { data, error } = await supabase
-      .from('missions')
-      .select(`
+      .from("missions")
+      .select(
+        `
         *,
         signalement:signalement_id (*),
         agent:agent_id (*),
         vehicule:vehicule_id (*)
-      `)
-      .order('date_creation', { ascending: false });
-    
+      `,
+      )
+      .order("date_creation", { ascending: false });
+
+    if (error) throw error;
+    return { data };
+  },
+
+  // Obtenir une missions
+  getById: async (missionId: string) => {
+    const { data, error } = await supabase
+      .from("missions")
+      .select(
+        `
+        *,
+        signalement:signalement_id (*),
+        agent:agent_id (*),
+        vehicule:vehicule_id (*)
+      `,
+      )
+      .eq("id", missionId)
+      .single()
+
     if (error) throw error;
     return { data };
   },
@@ -383,60 +406,68 @@ export const missionsApi = {
   // Obtenir les missions d'un agent
   getByAgent: async (agentId: string) => {
     const { data, error } = await supabase
-      .from('missions')
-      .select(`
+      .from("missions")
+      .select(
+        `
         *,
         signalement:signalement_id (*),
         vehicule:vehicule_id (*)
-      `)
-      .eq('agent_id', agentId)
-      .order('date_debut', { ascending: false });
-    
+      `,
+      )
+      .eq("agent_id", agentId)
+      .order("date_debut", { ascending: false });
+
     if (error) throw error;
     return { data };
   },
 
   // Mettre à jour le statut
-  updateStatut: async (id: string, statut: MissionStatut, commentaire?: string) => {
+  updateStatut: async (
+    id: string,
+    statut: MissionStatut,
+    commentaire?: string,
+  ) => {
     const { data, error } = await supabase
-      .from('missions')
+      .from("missions")
       .update({
         statut,
         date_derniere_mise_a_jour: new Date().toISOString(),
-        ...(statut === 'terminee' && { date_fin_reelle: new Date().toISOString() })
+        ...(statut === "terminee" && {
+          date_fin_reelle: new Date().toISOString(),
+        }),
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     // Ajouter à l'historique
-    await supabase
-      .from('missions_historique')
-      .insert([{
+    await supabase.from("missions_historique").insert([
+      {
         mission_id: id,
         nouveau_statut: statut,
         commentaire,
-        date_changement: new Date().toISOString()
-      }]);
-    
+        date_changement: new Date().toISOString(),
+      },
+    ]);
+
     return { data };
   },
 
   // Évaluer une mission
   evaluate: async (id: string, note: number, commentaire: string) => {
     const { data, error } = await supabase
-      .from('missions')
+      .from("missions")
       .update({
         note_agent: note,
         commentaire_evaluation: commentaire,
-        date_derniere_mise_a_jour: new Date().toISOString()
+        date_derniere_mise_a_jour: new Date().toISOString(),
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
-    
+
     if (error) throw error;
     return { data };
   },
@@ -444,11 +475,11 @@ export const missionsApi = {
   // Statistiques
   getStats: async () => {
     const { data, error } = await supabase
-      .from('missions_stats')
-      .select('*')
+      .from("missions_stats")
+      .select("*")
       .single();
-    
+
     if (error) throw error;
     return { data };
-  }
+  },
 };
