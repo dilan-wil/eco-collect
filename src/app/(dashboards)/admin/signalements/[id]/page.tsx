@@ -55,9 +55,9 @@ export default function SignalementDetailAdmin() {
   };
 
   const handleReject = async () => {
-    if(!report) return
-    await signalementsApi.updateStatus(report?.id, "rejete")
-  }
+    if (!report) return;
+    await signalementsApi.updateStatus(report?.id, "rejete");
+  };
 
   if (!report) {
     return (
@@ -235,8 +235,6 @@ export default function SignalementDetailAdmin() {
               confidence={report.confiance_ia}
               objects={["Done"]}
               accumulationLevel={report.niveau_accumulation}
-              decision="Validation Automatique"
-              reason="Correspondance forte avec le modèle de déchets urbains type 4."
               estimatedTime="30-45 minutes"
             />
           </div>
@@ -301,7 +299,12 @@ export default function SignalementDetailAdmin() {
         </div>
       </div>
       {showAssignDialog && report && (
-        <AssignModal report={report} onClose={() => {setShowAssignDialog(false)}} />
+        <AssignModal
+          report={report}
+          onClose={() => {
+            setShowAssignDialog(false);
+          }}
+        />
       )}
     </>
   );

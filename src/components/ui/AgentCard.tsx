@@ -1,14 +1,14 @@
-import * as React from "react"
-import { Phone, Mail, Award, CheckCircle2, Clock } from "lucide-react"
-import { Card, CardContent } from "./card"
-import { StatusBadge } from "./StatusBadge"
-import { Button } from "./button"
-import { Agent } from "@/lib/types"
-import { getInitials } from "@/lib/get-initials"
+import * as React from "react";
+import { Phone, Mail, Award, CheckCircle2, Clock } from "lucide-react";
+import { Card, CardContent } from "./card";
+import { StatusBadge } from "./StatusBadge";
+import { Button } from "./button";
+import { Agent } from "@/lib/types";
+import { getInitials } from "@/lib/get-initials";
 
 export function AgentCard({ agent }: { agent: Agent }) {
-  const isAvailable = agent.statut === "disponible"
-  
+  const isAvailable = agent.statut === "disponible";
+
   return (
     <Card className="overflow-hidden hover:shadow-md transition-all group">
       <CardContent className="p-0">
@@ -17,10 +17,15 @@ export function AgentCard({ agent }: { agent: Agent }) {
             <div className="flex gap-4 items-center">
               <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-inner relative">
                 {getInitials(agent.nom_complet)}
-                <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-2 border-background rounded-full ${
-                  isAvailable ? 'bg-green-500' : 
-                  agent.statut === "en_mission" ? 'bg-blue-500' : 'bg-red-500'
-                }`}></div>
+                <div
+                  className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-2 border-background rounded-full ${
+                    isAvailable
+                      ? "bg-green-500"
+                      : agent.statut === "en_mission"
+                        ? "bg-blue-500"
+                        : "bg-red-500"
+                  }`}
+                ></div>
               </div>
               <div>
                 <h3 className="font-bold text-lg">{agent.nom_complet}</h3>
@@ -32,7 +37,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
             </div>
             <StatusBadge status={agent.statut} />
           </div>
-          
+
           <div className="space-y-2 mb-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4" />
@@ -43,34 +48,38 @@ export function AgentCard({ agent }: { agent: Agent }) {
               <span className="truncate">{agent.email}</span>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3 py-3 border-t">
             <div className="text-center">
               <div className="flex justify-center items-center gap-1 text-muted-foreground mb-1">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span className="text-xs uppercase tracking-wider">Missions</span>
+                <span className="text-xs uppercase tracking-wider">
+                  Missions
+                </span>
               </div>
               <p className="font-bold text-lg">5</p>
             </div>
             <div className="text-center border-l">
               <div className="flex justify-center items-center gap-1 text-muted-foreground mb-1">
                 <Clock className="w-3.5 h-3.5" />
-                <span className="text-xs uppercase tracking-wider">Moyenne</span>
+                <span className="text-xs uppercase tracking-wider">
+                  Moyenne
+                </span>
               </div>
               <p className="font-bold text-lg">42m</p>
             </div>
           </div>
         </div>
-        
+
         <div className="px-6 py-3 bg-muted/50 border-t flex gap-2">
-          <Button variant={isAvailable ? "default" : "outline"} className="w-full text-sm h-9">
+          {/* <Button variant={isAvailable ? "default" : "outline"} className="w-full text-sm h-9">
             Assigner
-          </Button>
+          </Button> */}
           <Button variant="outline" className="w-full text-sm h-9">
             Profil
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
