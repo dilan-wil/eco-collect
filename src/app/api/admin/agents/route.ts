@@ -10,7 +10,6 @@ const AgentSchema = z.object({
   email: z.string().email("Email invalide"),
   nom_complet: z.string().min(2, "Nom complet requis"),
   matricule: z.string().min(2),
-  id_organisation: z.string().min(2),
   phone: z.string().optional(),
   zone_intervention: z.string().optional(),
   vehicule_id: z.string().uuid().optional(),
@@ -38,7 +37,6 @@ export async function POST(req: NextRequest) {
       phone,
       zone_intervention,
       matricule,
-      id_organisation,
       vehicule_id,
     } = validated;
 
@@ -104,7 +102,6 @@ export async function POST(req: NextRequest) {
         email,
         phone,
         matricule,
-        id_organisation,
         vehicule_id,
         date_creation: new Date().toISOString(),
         statut: "disponible",
