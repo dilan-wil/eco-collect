@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Search, MapPin, Clock, Truck, MoreHorizontal, Loader2 } from "lucide-react"
-import { Mission, MissionStatut } from "@/types/missions" // or wherever your types are
+import { Mission, MissionStatut } from "@/lib/types" // or wherever your types are
 
 export default function Missions() {
   const [missions, setMissions] = React.useState<Mission[]>([])
