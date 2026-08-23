@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Search, MapPin, Clock, Truck, MoreHorizontal, Loader2 } from "lucide-react"
-import { Mission, MissionStatut } from "@/lib/types"
+import { Mission, MissionStatut } from "@/types/missions" // or wherever your types are
 
 export default function Missions() {
   const [missions, setMissions] = React.useState<Mission[]>([])
@@ -25,7 +25,7 @@ export default function Missions() {
       setLoading(true)
       setError(null)
       const { data } = await missionsApi.getAll()
-      // Filtrer pour n'avoir que les missions actives (planifiée, en_cours, en_retard)
+      // Filtrer pour n'avoir que les missions actives (planifiee, en_cours, en_retard)
       const activeMissions = data?.filter((m: Mission) => 
         ['planifiee', 'en_cours', 'en_retard'].includes(m.statut)
       ) || []
@@ -46,8 +46,9 @@ export default function Missions() {
     return missions.filter(mission => 
       mission.description?.toLowerCase().includes(query) ||
       mission.reference?.toLowerCase().includes(query) ||
-      mission.agent?.nom?.toLowerCase().includes(query) ||
+      mission.agent?.nom_complet?.toLowerCase().includes(query) ||
       mission.signalement?.adresse?.toLowerCase().includes(query) ||
+      mission.signalement?.ville?.toLowerCase().includes(query) ||
       mission.tags?.some(tag => tag.toLowerCase().includes(query))
     )
   }, [missions, searchQuery])
@@ -79,6 +80,8 @@ export default function Missions() {
         return 'bg-red-500'
       case 'terminee':
         return 'bg-green-500'
+      case 'annulee':
+        return 'bg-gray-500'
       default:
         return 'bg-gray-500'
     }
@@ -94,6 +97,34 @@ export default function Missions() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  // Fonction pour obtenir la couleur de priorité
+  const getPriorityColor = (priorite: string) => {
+    switch (priorite) {
+      case 'critique':
+        return 'bg-red-100 text-red-700'
+      case 'haute':
+        return 'bg-orange-100 text-orange-700'
+      case 'normale':
+        return 'bg-blue-100 text-blue-700'
+      case 'basse':
+        return 'bg-gray-100 text-gray-700'
+      default:
+        return 'bg-gray-100 text-gray-700'
+    }
+  }
+
+  // Fonction pour obtenir le libellé du type de mission
+  const getMissionTypeLabel = (type: string | null) => {
+    if (!type) return null
+    const labels: Record<string, string> = {
+      'collecte': 'Collecte',
+      'inspection': 'Inspection',
+      'maintenance': 'Maintenance',
+      'urgente': 'Urgente'
+    }
+    return labels[type] || type
   }
 
   if (loading) {
@@ -161,18 +192,16 @@ export default function Missions() {
                   
                   <div className="mb-1 flex items-center gap-2">
                     <h3 className="font-bold truncate">{mission.reference || 'Mission'}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      mission.priorite === 'critique' ? 'bg-red-100 text-red-700' :
-                      mission.priorite === 'haute' ? 'bg-orange-100 text-orange-700' :
-                      mission.priorite === 'normale' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(mission.priorite)}`}>
                       {mission.priorite || 'normale'}
                     </span>
                   </div>
                   
                   <p className="text-sm text-muted-foreground mb-4 h-10 line-clamp-2">
-                    {signalement?.adresse || mission.description || 'Adresse non spécifiée'}
+                    {signalement?.adresse || 
+                     signalement?.ville || 
+                     mission.description || 
+                     'Adresse non spécifiée'}
                   </p>
                   
                   <div className="space-y-3 text-sm border-t pt-4">
@@ -180,7 +209,7 @@ export default function Missions() {
                       <span className="text-muted-foreground flex items-center gap-1.5">
                         <Truck className="w-4 h-4" /> Équipe
                       </span>
-                      <span className="font-medium">{agent?.nom || 'En attente'}</span>
+                      <span className="font-medium">{agent?.nom_complet || 'En attente'}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground flex items-center gap-1.5">
@@ -201,7 +230,15 @@ export default function Missions() {
                         <span className="text-muted-foreground flex items-center gap-1.5">
                           <MapPin className="w-4 h-4" /> Type
                         </span>
-                        <span className="font-medium capitalize">{mission.type_mission}</span>
+                        <span className="font-medium">{getMissionTypeLabel(mission.type_mission)}</span>
+                      </div>
+                    )}
+                    {mission.signalement?.categorie && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground flex items-center gap-1.5">
+                          <MapPin className="w-4 h-4" /> Catégorie
+                        </span>
+                        <span className="font-medium">{mission.signalement.categorie}</span>
                       </div>
                     )}
                     {mission.tags && mission.tags.length > 0 && (
