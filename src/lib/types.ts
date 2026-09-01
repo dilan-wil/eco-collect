@@ -1,43 +1,31 @@
 // types/signalements.ts
 
-export type Categorie = 
-  | 'Ménager'
-  | 'Plastique'
-  | 'Organique'
-  | 'Construction'
-  | 'Électronique'
-  | 'Dangereux'
+export type Categorie =
+  | "Ménager"
+  | "Plastique"
+  | "Organique"
+  | "Construction"
+  | "Électronique"
+  | "Dangereux";
 
-export type NiveauAccumulation = 
-  | 'faible'
-  | 'moyen'
-  | 'élevé'
-  | 'critique';
+export type NiveauAccumulation = "faible" | "moyen" | "élevé" | "critique";
 
-export type Priorite = 
-  | 'basse'
-  | 'moyenne'
-  | 'haute'
-  | 'critique';
+export type Priorite = "basse" | "moyenne" | "haute" | "critique";
 
-export type Statut = 
-  | 'nouveau'
-  | 'en_cours'
-  | 'resolu'
-  | 'ferme'
-  | 'rejete';
-
+export type Statut = "nouveau" | "en_cours" | "resolu" | "ferme" | "rejete";
 
 // Pour la création (sans les champs auto-générés)
 export type CreateSignalement = Omit<
   Signalement,
-  'id' | 'date_creation' | 'date_modification' | 'statut'
+  "id" | "date_creation" | "date_modification" | "statut"
 > & {
   statut?: Statut;
 };
 
 // Pour la mise à jour (tous les champs optionnels)
-export type UpdateSignalement = Partial<Omit<Signalement, 'id' | 'id_utilisateur' | 'date_creation'>>;
+export type UpdateSignalement = Partial<
+  Omit<Signalement, "id" | "id_utilisateur" | "date_creation">
+>;
 
 // Pour les filtres de recherche
 export interface SignalementFilters {
@@ -63,7 +51,7 @@ export interface User {
   points: number;
   created_at: string;
   updated_at: string;
-};
+}
 
 export interface Signalement {
   id: string;
@@ -83,6 +71,7 @@ export interface Signalement {
   id_utilisateur: string;
   assigne_a: string | null;
   categorie_id: string | null;
+  objets_ia: any;
   date_creation: Date;
   date_modification: Date;
   commentaire_interne: string | null;
@@ -98,17 +87,11 @@ export interface Vehicule {
 
   niveau_carburant: number;
 
-  statut:
-    | "disponible"
-    | "en_service"
-    | "en_maintenance";
+  statut: "disponible" | "en_service" | "en_maintenance";
 
   id_agent?: string | null;
 
-  statut_maintenance:
-    | "a_jour"
-    | "bientot_requise"
-    | "en_cours";
+  statut_maintenance: "a_jour" | "bientot_requise" | "en_cours";
 
   date_derniere_maintenance?: string | null;
 
@@ -124,11 +107,7 @@ export interface Agent {
 
   matricule: string;
 
-  statut:
-    | "disponible"
-    | "en_mission"
-    | "hors_service"
-    | "conge";
+  statut: "disponible" | "en_mission" | "hors_service" | "conge";
 
   disponibilite: boolean;
 
@@ -141,9 +120,14 @@ export interface Agent {
 }
 
 // types/missions.ts
-export type MissionStatut = 'planifiee' | 'en_cours' | 'terminee' | 'annulee' | 'en_retard';
-export type MissionPriorite = 'basse' | 'normale' | 'haute' | 'critique';
-export type MissionType = 'collecte' | 'inspection' | 'maintenance' | 'urgente';
+export type MissionStatut =
+  | "planifiee"
+  | "en_cours"
+  | "terminee"
+  | "annulee"
+  | "en_retard";
+export type MissionPriorite = "basse" | "normale" | "haute" | "critique";
+export type MissionType = "collecte" | "inspection" | "maintenance" | "urgente";
 
 export interface Mission {
   id: string;
@@ -172,7 +156,7 @@ export interface Mission {
   updated_by: string | null;
   created_at: Date;
   updated_at: Date;
-  
+
   // Relations (pour les jointures)
   signalement?: Signalement;
   agent?: Agent;

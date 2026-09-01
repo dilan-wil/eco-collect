@@ -274,7 +274,7 @@ export default function NouveauSignalement() {
       const confidence = data.confidence || 0;
 
       // ✅ Vérification de la confiance
-      if (confidence < 80) {
+      if (confidence < 65) {
         toast.error(
           `Qualité d'image insuffisante (${confidence}% de confiance).\nAssurez-vous que :\n• La photo est bien nette\n• Le déchet est bien visible\n• L'éclairage est suffisant`,
           { duration: 6000 },
