@@ -105,9 +105,9 @@ export default function CitizenDashboard() {
   }, []);
 
   const myReports = signalements;
-  const pending = myReports.filter((r) => r.statut === "en_cours").length;
+  const pending = myReports.filter((r) => r.statut === "nouveau").length;
   const active = myReports.filter((r) =>
-    ["nouveau", "en_cours"].includes(r.statut),
+    ["en_cours"].includes(r.statut),
   ).length;
   const completed = myReports.filter((r) => r.statut === "resolu").length;
 
