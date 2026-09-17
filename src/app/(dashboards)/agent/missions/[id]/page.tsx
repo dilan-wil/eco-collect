@@ -442,7 +442,7 @@ export default function MissionDetail() {
           transition={{ delay: 0.25 }}
           className="pb-4"
         >
-          {mission?.statut === "en_cours" && (
+          {mission?.statut === "planifiee" && (
             <Button
               className="w-full h-13 text-base gap-2 rounded-xl py-4 shadow-lg shadow-primary/20"
               onClick={handleStart}
