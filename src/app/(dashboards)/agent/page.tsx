@@ -15,6 +15,7 @@ import {
   Fuel, ChevronRight, AlertTriangle, Play, Star
 } from "lucide-react"
 import { Mission } from "@/lib/types"
+import { useAuth } from "@/contexts/auth-context";
 
 // Map backend priority to UI colors
 const priorityColor: Record<string, string> = {
@@ -31,15 +32,12 @@ const stopColor = (status: string) => {
   return 'bg-amber-400'
 }
 
-interface AgentDashboardProps {
-  user: { id: string; [key: string]: any } | null;
-}
-
-export default function AgentDashboard({ user }: AgentDashboardProps) {
+export default function AgentDashboard() {
   const [missions, setMissions] = useState<Mission[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-
+  const { user } = useAuth();
+  
   // Fetch missions from the API
   useEffect(() => {
     const fetchMissions = async () => {
@@ -49,7 +47,7 @@ export default function AgentDashboard({ user }: AgentDashboardProps) {
         setLoading(true);
         const { data } = await missionsApi.getByAgent(user.id);
         // Filter out rejected missions if your API doesn't do it already
-        setMissions(data);
+        setMissions(data || []);
         setError(null);
       } catch (err: any) {
         console.error("Erreur fetch missions:", err);
