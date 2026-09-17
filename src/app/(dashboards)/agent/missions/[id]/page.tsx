@@ -113,7 +113,7 @@ export default function MissionDetail() {
       const { data } = await missionsApi.updateStatut(mission.id, "terminee");
       setMission((prev: any) => ({ ...prev, ...data }));
       toast.success("Mission terminée ! +30 points gagnés 🎉");
-      setTimeout(() => router.push("/agent/dashboard"), 1800);
+      setTimeout(() => router.push("/agent"), 1800);
     } catch (err: any) {
       toast.error(err.message || "Erreur lors de la finalisation");
     } finally {
