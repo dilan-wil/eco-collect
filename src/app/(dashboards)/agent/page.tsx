@@ -26,8 +26,8 @@ const priorityColor: Record<string, string> = {
 
 // Map backend status to UI colors/animations
 const stopColor = (status: string) => {
-  if (status === 'TERMINEE') return 'bg-green-500'
-  if (status === 'EN_COURS') return 'bg-blue-500 animate-pulse'
+  if (status === 'terminee') return 'bg-green-500'
+  if (status === 'en_cours') return 'bg-blue-500 animate-pulse'
   return 'bg-amber-400'
 }
 
@@ -49,7 +49,7 @@ export default function AgentDashboard({ user }: AgentDashboardProps) {
         setLoading(true);
         const { data } = await missionsApi.getByAgent(user.id);
         // Filter out rejected missions if your API doesn't do it already
-        setMissions(data?.filter((m: Mission) => m.statut !== 'ANNULEE') || []);
+        setMissions(data);
         setError(null);
       } catch (err: any) {
         console.error("Erreur fetch missions:", err);
