@@ -18,10 +18,10 @@ import { Mission } from "@/lib/types"
 
 // Map backend priority to UI colors
 const priorityColor: Record<string, string> = {
-  URGENTE: 'bg-red-100 text-red-700 border-red-200',
-  HAUTE:    'bg-orange-100 text-orange-700 border-orange-200',
-  MOYENNE:  'bg-blue-100 text-blue-700 border-blue-200',
-  BASSE:    'bg-gray-100 text-gray-600 border-gray-200',
+  critique: 'bg-red-100 text-red-700 border-red-200',
+  haute:    'bg-orange-100 text-orange-700 border-orange-200',
+  normale:  'bg-blue-100 text-blue-700 border-blue-200',
+  basse:    'bg-gray-100 text-gray-600 border-gray-200',
 }
 
 // Map backend status to UI colors/animations
@@ -68,7 +68,7 @@ export default function AgentDashboard({ user }: AgentDashboardProps) {
   const myMissions = missions.map(m => ({
     id: m.id,
     status: m.statut === 'terminee' ? 'Complété' : m.statut === 'en_cours' ? 'En cours' : 'En attente',
-    priority: m.priorite === 'URGENTE' ? 'Critique' : m.priorite === 'HAUTE' ? 'Haute' : m.priorite === 'MOYENNE' ? 'Normale' : 'Basse',
+    priority: m.priorite === 'critique' ? 'Critique' : m.priorite === 'haute' ? 'Haute' : m.priorite === 'normale' ? 'Normale' : 'basse',
     wasteType: m.type_mission || 'Non spécifié',
     address: m.signalement?.adresse || m.description || 'Adresse inconnue',
     lat: m.metadata?.lat || m.signalement?.lat || 0,
