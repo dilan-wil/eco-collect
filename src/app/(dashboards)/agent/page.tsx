@@ -69,10 +69,10 @@ export default function AgentDashboard({ user }: AgentDashboardProps) {
     id: m.id,
     status: m.statut === 'terminee' ? 'Complété' : m.statut === 'en_cours' ? 'En cours' : 'En attente',
     priority: m.priorite === 'critique' ? 'Critique' : m.priorite === 'haute' ? 'Haute' : m.priorite === 'normale' ? 'Normale' : 'basse',
-    wasteType: m.type_mission || 'Non spécifié',
+    wasteType: m.categorie || 'Non spécifié',
     address: m.signalement?.adresse || m.description || 'Adresse inconnue',
-    lat: m.metadata?.lat || m.signalement?.lat || 0,
-    lng: m.metadata?.lng || m.signalement?.lng || 0,
+    lat: m.metadata?.latitude || m.signalement?.latitude || 0,
+    lng: m.metadata?.longitude || m.signalement?.longitude || 0,
     raw: m // Keep raw data if needed for details
   }));
 
