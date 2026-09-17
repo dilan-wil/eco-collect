@@ -69,7 +69,7 @@ export default function AgentDashboard({ user }: AgentDashboardProps) {
     id: m.id,
     status: m.statut === 'terminee' ? 'Complété' : m.statut === 'en_cours' ? 'En cours' : 'En attente',
     priority: m.priorite === 'critique' ? 'Critique' : m.priorite === 'haute' ? 'Haute' : m.priorite === 'normale' ? 'Normale' : 'basse',
-    wasteType: m.categorie || 'Non spécifié',
+    wasteType: m.signalement?.categorie || 'Non spécifié',
     address: m.signalement?.adresse || m.description || 'Adresse inconnue',
     lat: m.metadata?.latitude || m.signalement?.latitude || 0,
     lng: m.metadata?.longitude || m.signalement?.longitude || 0,
