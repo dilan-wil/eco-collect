@@ -1,6 +1,9 @@
 "use client"
 import * as React from "react"
-import { mockReports, mockVehicles } from "@/lib/mockData"
+import { useState, useEffect } from "react"
+// Replace this import with your actual API service path
+import { missionsApi } from "@/lib/api" 
+import { mockVehicles } from "@/lib/mockData"
 import { MapComponent } from "@/components/ui/MapComponent"
 import { StatusBadge } from "@/components/ui/StatusBadge"
 import { Button } from "@/components/ui/button"
@@ -11,28 +14,74 @@ import {
   MapPin, Navigation, CheckCircle2, Clock, Truck,
   Fuel, ChevronRight, AlertTriangle, Play, Star
 } from "lucide-react"
+import { Mission } from "@/lib/types"
 
+// Map backend priority to UI colors
 const priorityColor: Record<string, string> = {
-  Critique: 'bg-red-100 text-red-700 border-red-200',
-  Haute:    'bg-orange-100 text-orange-700 border-orange-200',
-  Normale:  'bg-blue-100 text-blue-700 border-blue-200',
-  Basse:    'bg-gray-100 text-gray-600 border-gray-200',
+  URGENTE: 'bg-red-100 text-red-700 border-red-200',
+  HAUTE:    'bg-orange-100 text-orange-700 border-orange-200',
+  MOYENNE:  'bg-blue-100 text-blue-700 border-blue-200',
+  BASSE:    'bg-gray-100 text-gray-600 border-gray-200',
 }
 
+// Map backend status to UI colors/animations
 const stopColor = (status: string) => {
-  if (status === 'Complété') return 'bg-green-500'
-  if (status === 'En cours') return 'bg-blue-500 animate-pulse'
+  if (status === 'TERMINEE') return 'bg-green-500'
+  if (status === 'EN_COURS') return 'bg-blue-500 animate-pulse'
   return 'bg-amber-400'
 }
 
-export default function AgentDashboard() {
-  const myMissions = mockReports.filter(r => r.agentId === "AGT-001" && r.status !== 'Rejeté')
+interface AgentDashboardProps {
+  user: { id: string; [key: string]: any } | null;
+}
+
+export default function AgentDashboard({ user }: AgentDashboardProps) {
+  const [missions, setMissions] = useState<Mission[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch missions from the API
+  useEffect(() => {
+    const fetchMissions = async () => {
+      if (!user?.id) return;
+      
+      try {
+        setLoading(true);
+        const { data } = await missionsApi.getByAgent(user.id);
+        // Filter out rejected missions if your API doesn't do it already
+        setMissions(data?.filter((m: Mission) => m.statut !== 'ANNULEE') || []);
+        setError(null);
+      } catch (err: any) {
+        console.error("Erreur fetch missions:", err);
+        setError(err.message || "Erreur lors du chargement des missions");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMissions();
+  }, [user?.id]);
+
+  // --- Data Mapping & Calculations ---
+  
+  // Transform backend data to match the UI's expected format
+  const myMissions = missions.map(m => ({
+    id: m.id,
+    status: m.statut === 'terminee' ? 'Complété' : m.statut === 'en_cours' ? 'En cours' : 'En attente',
+    priority: m.priorite === 'URGENTE' ? 'Critique' : m.priorite === 'HAUTE' ? 'Haute' : m.priorite === 'MOYENNE' ? 'Normale' : 'Basse',
+    wasteType: m.type_mission || 'Non spécifié',
+    address: m.signalement?.adresse || m.description || 'Adresse inconnue',
+    lat: m.metadata?.lat || m.signalement?.lat || 0,
+    lng: m.metadata?.lng || m.signalement?.lng || 0,
+    raw: m // Keep raw data if needed for details
+  }));
+
   const completed  = myMissions.filter(r => r.status === 'Complété').length
   const inProgress = myMissions.filter(r => r.status === 'En cours').length
   const remaining  = myMissions.length - completed
-  const progress   = Math.round((completed / myMissions.length) * 100)
+  const progress   = myMissions.length > 0 ? Math.round((completed / myMissions.length) * 100) : 0
 
-  const vehicle = mockVehicles[0]
+  const vehicle = mockVehicles[0] // Replace with real vehicle fetch if available
 
   const mapMarkers = myMissions.map(r => ({
     id: r.id,
@@ -40,6 +89,26 @@ export default function AgentDashboard() {
     lng: r.lng,
     color: r.status === 'Complété' ? '#22C55E' : r.status === 'En cours' ? '#3B82F6' : '#F59E0B'
   }))
+
+  // --- Render States ---
+  
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-3 text-muted-foreground">Chargement de votre tournée...</span>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl m-4">
+        <p className="font-bold">Erreur</p>
+        <p className="text-sm">{error}</p>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -155,78 +224,84 @@ export default function AgentDashboard() {
             </Link>
           </div>
 
-          <div className="relative">
-            {/* Vertical line */}
-            <div className="absolute left-[22px] top-6 bottom-6 w-0.5 bg-border" />
+          {myMissions.length === 0 ? (
+             <div className="text-center p-8 text-muted-foreground bg-muted/20 rounded-xl border border-dashed">
+               Aucune mission pour aujourd'hui.
+             </div>
+          ) : (
+            <div className="relative">
+              {/* Vertical line */}
+              <div className="absolute left-[22px] top-6 bottom-6 w-0.5 bg-border" />
 
-            <div className="space-y-3">
-              {myMissions.map((mission, idx) => {
-                const isDone = mission.status === 'Complété'
-                const isCurrent = mission.status === 'En cours'
+              <div className="space-y-3">
+                {myMissions.map((mission, idx) => {
+                  const isDone = mission.status === 'Complété'
+                  const isCurrent = mission.status === 'En cours'
 
-                return (
-                  <motion.div
-                    key={mission.id}
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.06 }}
-                  >
-                    <div className={`flex gap-4 ${isDone ? 'opacity-60' : ''}`}>
-                      {/* Stop number */}
-                      <div className="relative z-10 shrink-0 flex flex-col items-center pt-3">
-                        <div className={`w-[46px] h-[46px] rounded-full border-2 flex items-center justify-center font-black text-sm
-                          ${isDone ? 'border-green-500 bg-green-50 text-green-700'
-                            : isCurrent ? 'border-blue-500 bg-blue-500 text-white shadow-lg shadow-blue-200'
-                            : 'border-border bg-card text-muted-foreground'
-                          }`}
-                        >
-                          {isDone ? <CheckCircle2 className="w-5 h-5" /> : idx + 1}
-                        </div>
-                      </div>
-
-                      {/* Card */}
-                      <Card className={`flex-1 overflow-hidden transition-all ${isCurrent ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'} ${isDone ? 'bg-muted/30' : ''}`}>
-                        <div className={`h-1 w-full ${stopColor(mission.status)}`} />
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-bold text-sm">{mission.wasteType}</span>
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${priorityColor[mission.priority]}`}>
-                                  {mission.priority}
-                                </span>
-                                {isCurrent && (
-                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500 text-white animate-pulse">
-                                    EN COURS
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                                <MapPin className="w-3 h-3 shrink-0" />
-                                <span className="truncate">{mission.address}</span>
-                              </p>
-                            </div>
-                            <StatusBadge status={mission.status} />
+                  return (
+                    <motion.div
+                      key={mission.id}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.06 }}
+                    >
+                      <div className={`flex gap-4 ${isDone ? 'opacity-60' : ''}`}>
+                        {/* Stop number */}
+                        <div className="relative z-10 shrink-0 flex flex-col items-center pt-3">
+                          <div className={`w-[46px] h-[46px] rounded-full border-2 flex items-center justify-center font-black text-sm
+                            ${isDone ? 'border-green-500 bg-green-50 text-green-700'
+                              : isCurrent ? 'border-blue-500 bg-blue-500 text-white shadow-lg shadow-blue-200'
+                              : 'border-border bg-card text-muted-foreground'
+                            }`}
+                          >
+                            {isDone ? <CheckCircle2 className="w-5 h-5" /> : idx + 1}
                           </div>
+                        </div>
 
-                          {!isDone && (
-                            <div className="flex gap-2 mt-3">
-                              <Button size="sm" className="h-7 text-xs flex-1">
-                                <Link href={`/agent/mission/${mission.id}`}>Détails <ChevronRight className="w-3 h-3 ml-0.5" /></Link>
-                              </Button>
-                              <Button size="sm" variant="outline" className="h-7 text-xs gap-1">
-                                <Navigation className="w-3 h-3" /> GPS
-                              </Button>
+                        {/* Card */}
+                        <Card className={`flex-1 overflow-hidden transition-all ${isCurrent ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'} ${isDone ? 'bg-muted/30' : ''}`}>
+                          <div className={`h-1 w-full ${stopColor(mission.status)}`} />
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-bold text-sm">{mission.wasteType}</span>
+                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${priorityColor[mission.priority]}`}>
+                                    {mission.priority}
+                                  </span>
+                                  {isCurrent && (
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500 text-white animate-pulse">
+                                      EN COURS
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                                  <MapPin className="w-3 h-3 shrink-0" />
+                                  <span className="truncate">{mission.address}</span>
+                                </p>
+                              </div>
+                              <StatusBadge status={mission.status} />
                             </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </motion.div>
-                )
-              })}
+
+                            {!isDone && (
+                              <div className="flex gap-2 mt-3">
+                                <Button size="sm" className="h-7 text-xs flex-1">
+                                  <Link href={`/agent/mission/${mission.id}`}>Détails <ChevronRight className="w-3 h-3 ml-0.5" /></Link>
+                                </Button>
+                                <Button size="sm" variant="outline" className="h-7 text-xs gap-1">
+                                  <Navigation className="w-3 h-3" /> GPS
+                                </Button>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Map */}
