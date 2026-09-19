@@ -106,7 +106,7 @@ export default function MissionDetail() {
   };
 
   const handleComplete = async () => {
-    if (!mission) return;
+    if (!mission || !signalement) return;
     if (!cleanPhoto) {
       toast.error("Prenez une photo du site nettoyé avant de valider");
       return;
