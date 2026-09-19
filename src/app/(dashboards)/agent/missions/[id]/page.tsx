@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { missionsApi } from "@/lib/api"; // chemin à ajuster
+import { missionsApi, signalementsApi } from "@/lib/api"; // chemin à ajuster
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { MapComponent } from "@/components/ui/MapComponent";
@@ -111,6 +111,7 @@ export default function MissionDetail() {
     setUpdating(true);
     try {
       const { data } = await missionsApi.updateStatut(mission.id, "terminee");
+      await signalementsApi.updateStatus(mission.signalement.id, "resolu");
       setMission((prev: any) => ({ ...prev, ...data }));
       toast.success("Mission terminée ! +30 points gagnés 🎉");
       setTimeout(() => router.push("/agent"), 1800);
