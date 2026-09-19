@@ -64,6 +64,9 @@ export default function MissionDetail() {
   const [updating, setUpdating] = React.useState(false);
   const fileRef = React.useRef<HTMLInputElement>(null);
 
+  // Récupération du signalement associé
+  const signalement = mission?.signalement;
+  
   // Chargement de la mission
   React.useEffect(() => {
     const fetchMission = async () => {
@@ -111,7 +114,7 @@ export default function MissionDetail() {
     setUpdating(true);
     try {
       const { data } = await missionsApi.updateStatut(mission.id, "terminee");
-      await signalementsApi.updateStatus(mission.signalement.id, "resolu");
+      await signalementsApi.updateStatus(signalement.id, "resolu");
       setMission((prev: any) => ({ ...prev, ...data }));
       toast.success("Mission terminée ! +30 points gagnés 🎉");
       setTimeout(() => router.push("/agent"), 1800);
@@ -134,9 +137,6 @@ export default function MissionDetail() {
     : "";
   const isActive = mission?.statut === "en_cours";
   const isDone = mission?.statut === "terminee";
-
-  // Récupération du signalement associé
-  const signalement = mission?.signalement;
 
   // Priorité (par défaut Normale)
   const priority = signalement?.priorite || "Normale";
